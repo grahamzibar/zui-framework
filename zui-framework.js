@@ -16,8 +16,6 @@ var ZUI = {};
 	 *     width
 	 *     height
 	 *     viewAngle3D
-	 *     near3D
-	 *     far3D
 	 *     container
 	 *     firstView
 	 *     views
@@ -40,8 +38,8 @@ var ZUI = {};
 		ZUI.Three.camera = new THREE.PerspectiveCamera(
 			settings.viewAngle3D || 45,
 			(settings.width / settings.height) || (1024 / 800),
-			settings.near3D || 1,
-			settings.far3D || 10000
+			1,
+			10000
 		);
 		ZUI.Three.renderer.setSize(
 			(settings.width + settings.height * 0) || 1024,
@@ -195,11 +193,12 @@ var ZUI = {};
 		ZUI.Three.camera = null;
 
 	/**
-	 * View class
+	 * ZUI.View class
 	 */
-	ZUI.View = function() {};
-		ZUI.View.prototype.minMagnification = 1;
-		ZUI.View.prototype.maxMagnification = 100;
+	ZUI.View = function() {
+		this.minMagnification = 1;
+		this.maxMagnification = 100;
+	};
 		
 		/* Event handlers default behaviour */
 		ZUI.View.prototype.onLeftClick = function(event) {};
