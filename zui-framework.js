@@ -3,8 +3,8 @@
  */
 
 /**
-* ZUI namespace
-*/
+ * ZUI namespace
+ */
 var ZUI = {};
 	ZUI.activeView = null;
 	ZUI.Views = null;
@@ -80,7 +80,7 @@ var ZUI = {};
 	};
 	
 	/**
-	 Renders 3D and 2D layers
+	 * Renders 3D and 2D layers
 	 */
 	ZUI.render = function() {
 		ZUI.Three.renderer.render(ZUI.Three.scene, ZUI.Three.camera);
@@ -88,7 +88,7 @@ var ZUI = {};
 	};
 	
 	/**
-	 Handles mouse down event
+	 * Handles mouse down event
 	 */
 	ZUI._onClick = function(event) {
 		if (event.button == 0) {
@@ -103,7 +103,7 @@ var ZUI = {};
 	};
 	
 	/**
-	 Handles mouse down event
+	 * Handles mouse down event
 	 */
 	ZUI._onDoubleClick = function(event) {
 		event.preventDefault();
@@ -119,7 +119,7 @@ var ZUI = {};
 	};
 	
 	/**
-	 Handles mouse down event
+	 * Handles mouse down event
 	 */
 	ZUI._onMouseDown = function(event) {
 		if (event.button == 0) {
@@ -134,7 +134,7 @@ var ZUI = {};
 	};
 	
 	/**
-	 Handles mouse up event
+	 * Handles mouse up event
 	 */
 	ZUI._onMouseUp = function(event) {
 		if (event.button == 0) {
@@ -149,21 +149,21 @@ var ZUI = {};
 	};
 	
 	/**
-	 Handles mouse move event
+	 * Handles mouse move event
 	 */
 	ZUI._onMouseMove = function(event) {
 		ZUI.activeView.onMouseMove(event);
 	};
 	
 	/**
-	 Handles mouse wheel event
+	 * Handles mouse wheel event
 	 */
 	ZUI._onMouseWheel = function(event) {
 		ZUI.activeView.onMouseWheel(event);
 	};
 	
 	/**
-	 Handles context menu event
+	 * Handles context menu event
 	 */
 	ZUI._onContextMenu = function(event) {
 		event.preventDefault();
@@ -171,7 +171,7 @@ var ZUI = {};
 	};
 	
 	/**
-	 Handles render event
+	 * Handles render event
 	 */
 	ZUI._onRender = function() {
 		requestAnimationFrame(ZUI._onRender);
