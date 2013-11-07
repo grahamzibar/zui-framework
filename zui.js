@@ -586,7 +586,7 @@ ZUI.View = function() {
 	ZUI.View.prototype.leftDoubleClick = function() {};
 	ZUI.View.prototype.middleDoubleClick = function() {};
 	ZUI.View.prototype.mouseWheel = function(scroll) {};
-	ZUI.View.prototype.contextmenu = function() {};
+	ZUI.View.prototype.contextMenu = function() {};
 	ZUI.View.prototype.getLoadProgress = function() {};		//return Number between 0 and 1, inclusive
 
 /* View object class */
@@ -682,20 +682,22 @@ ZUI.ViewObject = function(attributes) {
 	this.isHovered = false;
 	
 	/* Define event handlers */
-	this.leftMouseDown = function() {};
-	this.middleMouseDown = function() {};
-	this.rightMouseDown = function() {};
-	this.leftMouseUp = function() {};
-	this.middleMouseUp = function() {};
-	this.rightMouseUp = function() {};
-	this.mouseMove = function() {};
-	this.leftClick = function() {};
-	this.middleClick = function() {};
-	this.rightClick = function() {};
-	this.leftDoubleClick = function() {};
-	this.middleDoubleClick = function() {};
-	this.mouseWheel = function(scroll) {};
-	this.contextmenu = function() {};
+	this.leftMouseDown = (attributes.leftMouseDown == undefined) ? function() {} : attributes.leftMouseDown;
+	this.middleMouseDown = (attributes.middleMouseDown == undefined) ? function() {} : attributes.middleMouseDown;
+	this.rightMouseDown = (attributes.rightMouseDown == undefined) ? function() {} : attributes.rightMouseDown;
+	this.leftMouseUp = (attributes.leftMouseUp == undefined) ? function() {} : attributes.leftMouseUp;
+	this.middleMouseUp = (attributes.middleMouseUp == undefined) ? function() {} : attributes.middleMouseUp;
+	this.rightMouseUp = (attributes.rightMouseUp == undefined) ? function() {} : attributes.rightMouseUp;
+	this.mouseMove = (attributes.mouseMove == undefined) ? function() {} : attributes.mouseMove;
+	this.leftClick = (attributes.leftClick == undefined) ? function() {} : attributes.leftClick;
+	this.middleClick = (attributes.middleClick == undefined) ? function() {} : attributes.middleClick;
+	this.rightClick = (attributes.rightClick == undefined) ? function() {} : attributes.rightClick;
+	this.leftDoubleClick = (attributes.leftDoubleClick == undefined) ? function() {} : attributes.leftDoubleClick;
+	this.middleDoubleClick = (attributes.middleDoubleClick == undefined) ? function() {} : attributes.middleDoubleClick;
+	this.mouseWheel = (attributes.mouseWheel == undefined) ? function() {} : attributes.mouseWheel;
+	this.contextMenu = (attributes.contextMenu == undefined) ? function() {} : attributes.contextMenu;
+	this.mouseOver = (attributes.mouseOver == undefined) ? function() {} : attributes.mouseOver;
+	this.mouseOut = (attributes.mouseOut == undefined) ? function() {} : attributes.mouseOut;
 };
 
 	ZUI.ViewObject.prototype.draw = function() {
