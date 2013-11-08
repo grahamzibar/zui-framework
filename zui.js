@@ -11,7 +11,7 @@
 })();
 
 /* ZUI namespace */
-function ZUI() {}
+var ZUI = {};
 
 /* Div container */
 ZUI.container = null;
@@ -92,6 +92,9 @@ ZUI.camera = function() {};
 
 	/* Rate at which the camera moves */
 	ZUI.camera.moveRate = 1;
+
+	/* Auto-update option */
+	ZUI.camera.autoUpdate = false;
 
 	/* Updates camera position */
 	ZUI.camera.update = function() {
@@ -190,6 +193,32 @@ ZUI.getNumberWithComma = function(number) {
 	return parts.join(".");
 };
 
+/* Checks whether two lines intersect */
+ZUI.testRayLineIntersect = function(x1, y1, s1, x21, y21, x22, y22) {
+	/* Test vertical */
+	if (x22 == x21) {
+		if (x1 > x21) return 0;
+		var y = s1 * (x21 - x1) + y1;
+		if (y >= y21 && y <= y22 || y >= y22 && y <= y21) return 1;
+		return 0;
+	}
+
+	/* Test parallel */
+	var s2 = (y22 - y21) / (x22 - x21);
+	if (s1 == s2) {
+		/* Test overlap */
+		if (s1 * x1 + y1 == x21 * s2 + y21) {
+			if (x1 >= x21 && x1 <= x22 || x1 >= x22 && x1 <= x21) return 2;
+		}
+		return 0;
+	}
+
+	/* Test intersect */
+	var x = ((x1 * s1 - y1) - (x21 * s2 - y21)) / (s1 - s2);
+	if (x >= x1 && (x >= x21 && x <= x22 || x >= x22 && x <= x21)) return 1;
+	return 0;
+};
+
 /* Converts canvas to an image displayed in a new window */
 ZUI.toImageInWindow = function() {
 	window.open(ZUI.canvas.toDataURL());
@@ -267,6 +296,11 @@ ZUI.draw = function(timestamp) {
 	
 		/* Call update function */
 		ZUI.update();
+
+		/* Update camera */
+		if (ZUI.camera.autoUpdate) {
+			ZUI.camera.update();
+		}
 	
 		/* Clear canvas */
 		ZUI.context.clearRect(0, 0, ZUI.width, ZUI.height);
@@ -276,7 +310,15 @@ ZUI.draw = function(timestamp) {
 		ZUI.context.fillStyle = ZUI.background;
 		ZUI.context.fillRect(0, 0, ZUI.width, ZUI.height)
 		ZUI.context.restore();
-	
+
+		/* Auto-draw */
+		var viewObjects = ZUI.activeView.viewObjects;
+		for (var n = 0; n < viewObjects.length; n++) {
+			if (viewObjects[n].autoDraw) {
+				viewObjects[n].draw();
+			}
+		}
+
 		/* Draw */
 		if (ZUI.animation == null) {
 			if (ZUI.isChangeView) {
@@ -611,6 +653,7 @@ ZUI.ViewObject = function(attributes) {
 			this.lbradius = attributes.radius;
 			this.rbradius = attributes.radius;
 		}
+		this.centerAt = (attributes.centerAt == undefined) ? "center center" : attributes.centerAt;
 	}
 	else if (this.shape == "circle") {
 		this.x = (attributes.x == undefined) ? 0 : attributes.x;
@@ -623,16 +666,17 @@ ZUI.ViewObject = function(attributes) {
 			this.hradius = attributes.radius;
 			this.vradius = attributes.radius;
 		}
+		this.centerAt = (attributes.centerAt == undefined) ? "center center" : attributes.centerAt;
 	}
 	else if (this.shape == "polygon") {
 		this.x = (attributes.x == undefined) ? 0 : attributes.x;
 		this.y = (attributes.y == undefined) ? 0 : attributes.y;
-		this.vertices = (attributes.vertices == undefined || attributes.vertices.length == undefined) ? [] : attributes.vertices;
+		this.vertices = (attributes.vertices == undefined) ? [] : attributes.vertices;
 	}
 	else if (this.shape == "path") {
 		this.x = (attributes.x == undefined) ? 0 : attributes.x;
 		this.y = (attributes.y == undefined) ? 0 : attributes.y;
-		this.vertices = (attributes.vertices == undefined || attributes.vertices.length == undefined) ? [] : attributes.vertices;
+		this.instructions = (attributes.instructions == undefined) ? "" : attributes.instructions;
 	}
 	else if (this.shape == "text") {
 		this.x = (attributes.x == undefined) ? 0 : attributes.x;
@@ -661,6 +705,8 @@ ZUI.ViewObject = function(attributes) {
 			var url = DOMURL.createObjectURL(svg);
 			this.image.onload = $.proxy(function() {
 				this.ready = true;
+				this.width = this.image.width;
+				this.height = this.image.height;
 			}, this);
 			this.image.src = url;
 		}, this));
@@ -676,7 +722,11 @@ ZUI.ViewObject = function(attributes) {
 	this.alpha = (attributes.alpha == undefined) ? 1 : attributes.alpha;
 
 	/* Set scale */
-	this.scale = (attributes.scale == undefined) ? "world" : attributes.scale;
+	this.positionScale = (attributes.positionScale == undefined) ? "world" : attributes.positionScale;
+	this.sizeScale = (attributes.sizeScale == undefined) ? "world" : attributes.sizeScale;
+
+	/* Set autoDraw option */
+	this.autoDraw = (attributes.autoDraw == undefined) ? false : attributes.autoDraw;
 	
 	/* Initialize hover state */
 	this.isHovered = false;
@@ -702,10 +752,16 @@ ZUI.ViewObject = function(attributes) {
 
 	ZUI.ViewObject.prototype.draw = function() {
 		if (this.shape == "rect") {
-			if (this.scale == "world") {
+			if (this.positionScale == "world") {
 				var position = ZUI.camera.projectPoint(this.x, this.y);
 				this.screenX = position.x;
 				this.screenY = position.y;
+			}
+			else if (this.positionScale == "screen") {
+				this.screenX = this.x;
+				this.screenY = this.y;
+			}
+			if (this.sizeScale == "world") {
 				this.screenWidth = ZUI.camera.projectDistance(this.width);
 				this.screenHeight = ZUI.camera.projectDistance(this.height);
 				this.screenLtradius = ZUI.camera.projectDistance(this.ltradius);
@@ -713,9 +769,7 @@ ZUI.ViewObject = function(attributes) {
 				this.screenLbradius = ZUI.camera.projectDistance(this.lbradius);
 				this.screenRbradius = ZUI.camera.projectDistance(this.rbradius);
 			}
-			else if (this.scale == "screen") {
-				this.screenX = this.x;
-				this.screenY = this.y;
+			else if (this.sizeScale == "screen") {
 				this.screenWidth = this.width;
 				this.screenHeight = this.height;
 				this.screenLtradius = this.ltradius;
@@ -723,17 +777,45 @@ ZUI.ViewObject = function(attributes) {
 				this.screenLbradius = this.lbradius;
 				this.screenRbradius = this.rbradius;
 			}
+			if (this.screenLtradius > this.screenWidth / 2) this.screenLtradius = this.screenWidth / 2;
+			if (this.screenLtradius > this.screenHeight / 2) this.screenLtradius = this.screenHeight / 2;
+			if (this.screenRtradius > this.screenWidth / 2) this.screenRtradius = this.screenWidth / 2;
+			if (this.screenRtradius > this.screenHeight / 2) this.screenRtradius = this.screenHeight / 2;
+			if (this.screenLbradius > this.screenWidth / 2) this.screenLbradius = this.screenWidth / 2;
+			if (this.screenLbradius > this.screenHeight / 2) this.screenLbradius = this.screenHeight / 2;
+			if (this.screenRbradius > this.screenWidth / 2) this.screenRbradius = this.screenWidth / 2;
+			if (this.screenRbradius > this.screenHeight / 2) this.screenRbradius = this.screenHeight / 2;
 			ZUI.context.save();
 			ZUI.context.strokeStyle = this.strokeColor;
 			ZUI.context.lineWidth = this.strokeWidth;
 			ZUI.context.fillStyle = this.fillColor;
 			ZUI.context.globalAlpha = this.alpha;
+			var screenX, screenY;
+			var centerAt = this.centerAt.split(" ");
+			if (centerAt[0] == "left") {
+				screenX = this.screenX;
+			}
+			else if (centerAt[0] == "center") {
+				screenX = this.screenX - this.screenWidth / 2;
+			}
+			else if (centerAt[0] == "right") {
+				screenX = this.screenX - this.screenWidth;
+			}
+			if (centerAt[1] == "top") {
+				screenY = this.screenY;
+			}
+			else if (centerAt[1] == "center") {
+				screenY = this.screenY - this.screenHeight / 2;
+			}
+			else if (centerAt[1] == "bottom") {
+				screenY = this.screenY - this.screenHeight;
+			}
 			ZUI.context.beginPath();
-			ZUI.context.moveTo(this.screenX + this.screenLtradius, this.screenY);
-			ZUI.context.arcTo(this.screenX + this.screenWidth, this.screenY, this.screenX + this.screenWidth, this.screenY + this.screenHeight, this.screenRtradius);
-			ZUI.context.arcTo(this.screenX + this.screenWidth, this.screenY + this.screenHeight, this.screenX, this.screenY + this.screenHeight, this.screenRbradius);
-			ZUI.context.arcTo(this.screenX, this.screenY + this.screenHeight, this.screenX, this.screenY, this.screenLbradius);
-			ZUI.context.arcTo(this.screenX, this.screenY, this.screenX + this.screenWidth, this.screenY, this.screenLtradius);
+			ZUI.context.moveTo(screenX + this.screenLtradius, screenY);
+			ZUI.context.arcTo(screenX + this.screenWidth, screenY, screenX + this.screenWidth, screenY + this.screenHeight, this.screenRtradius);
+			ZUI.context.arcTo(screenX + this.screenWidth, screenY + this.screenHeight, screenX, screenY + this.screenHeight, this.screenRbradius);
+			ZUI.context.arcTo(screenX, screenY + this.screenHeight, screenX, screenY, this.screenLbradius);
+			ZUI.context.arcTo(screenX, screenY, screenX + this.screenWidth, screenY, this.screenLtradius);
 			ZUI.context.closePath();
 			if (this.stroke) {
 				ZUI.context.stroke();
@@ -744,16 +826,20 @@ ZUI.ViewObject = function(attributes) {
 			ZUI.context.restore();
 		}
 		else if (this.shape == "circle") {
-			if (this.scale == "world") {
+			if (this.positionScale == "world") {
 				var position = ZUI.camera.projectPoint(this.x, this.y);
 				this.screenX = position.x;
 				this.screenY = position.y;
+			}
+			else if (this.positionScale == "screen") {
+				this.screenX = this.x;
+				this.screenY = this.y;
+			}
+			if (this.sizeScale == "world") {
 				this.screenHradius = ZUI.camera.projectDistance(this.hradius);
 				this.screenVradius = ZUI.camera.projectDistance(this.vradius);
 			}
-			else if (this.scale == "screen") {
-				this.screenX = this.x;
-				this.screenY = this.y;
+			else if (this.sizeScale == "screen") {
 				this.screenHradius = this.hradius;
 				this.screenVradius = this.vradius;
 			}
@@ -762,8 +848,28 @@ ZUI.ViewObject = function(attributes) {
 			ZUI.context.lineWidth = this.strokeWidth;
 			ZUI.context.fillStyle = this.fillColor;
 			ZUI.context.globalAlpha = this.alpha;
+			var screenX, screenY;
+			var centerAt = this.centerAt.split(" ");
+			if (centerAt[0] == "left") {
+				screenX = this.screenX + this.screenHradius / 2;
+			}
+			else if (centerAt[0] == "center") {
+				screenX = this.screenX;
+			}
+			else if (centerAt[0] == "right") {
+				screenX = this.screenX - this.screenHradius / 2;
+			}
+			if (centerAt[1] == "top") {
+				screenY = this.screenY + this.screenVradius / 2;
+			}
+			else if (centerAt[1] == "center") {
+				screenY = this.screenY;
+			}
+			else if (centerAt[1] == "bottom") {
+				screenY = this.screenY - this.screenVradius / 2;
+			}
 			ZUI.context.save();
-			ZUI.context.translate(this.screenX, this.screenY);
+			ZUI.context.translate(screenX, screenY);
 			ZUI.context.scale(this.screenHradius, this.screenVradius);
 			ZUI.context.beginPath();
 			ZUI.context.arc(0, 0, 1, 0, 2 * Math.PI);
@@ -778,21 +884,71 @@ ZUI.ViewObject = function(attributes) {
 			ZUI.context.restore();
 		}
 		else if (this.shape == "polygon") {
-			//TODO
+			if (this.positionScale == "world") {
+				var position = ZUI.camera.projectPoint(this.x, this.y);
+				this.screenX = position.x;
+				this.screenY = position.y;
+			}
+			else if (this.positionScale == "screen") {
+				this.screenX = this.x;
+				this.screenY = this.y;
+			}
+			if (this.sizeScale == "world") {
+				this.screenVertices = [];
+				for (var n = 0; n < this.vertices.length; n++) {
+					this.screenVertices.push({
+						x: ZUI.camera.projectDistance(this.vertices[n].x),
+						y: ZUI.camera.projectDistance(this.vertices[n].y)
+					});
+				}
+			}
+			else if (this.sizeScale == "screen") {
+				this.screenVertices = [];
+				for (var n = 0; n < this.vertices.length; n++) {
+					this.screenVertices.push({
+						x: this.vertices[n].x,
+						y: this.vertices[n].y
+					});
+				}
+			}
+
+			ZUI.context.save();
+			ZUI.context.strokeStyle = this.strokeColor;
+			ZUI.context.lineWidth = this.strokeWidth;
+			ZUI.context.fillStyle = this.fillColor;
+			ZUI.context.globalAlpha = this.alpha;
+			ZUI.context.translate(this.screenX, this.screenY);
+			ZUI.context.beginPath();
+			ZUI.context.moveTo(this.screenVertices[this.screenVertices.length - 1].x, this.screenVertices[this.screenVertices.length - 1].y);
+			for (var n = 0; n < this.screenVertices.length; n++) {
+				ZUI.context.lineTo(this.screenVertices[n].x, this.screenVertices[n].y);
+			}
+			ZUI.context.closePath();
+			if (this.stroke) {
+				ZUI.context.stroke();
+			}
+			if (this.fill) {
+				ZUI.context.fill();
+			}
+			ZUI.context.restore();
 		}
 		else if (this.shape == "path") {
 			//TODO
 		}
 		else if (this.shape == "text") {
-			if (this.scale == "world") {
+			if (this.positionScale == "world") {
 				var position = ZUI.camera.projectPoint(this.x, this.y);
 				this.screenX = position.x;
 				this.screenY = position.y;
-				this.screenSize = ZUI.camera.projectDistance(this.size);
 			}
-			else if (this.scale == "screen") {
+			else if (this.positionScale == "screen") {
 				this.screenX = this.x;
 				this.screenY = this.y;
+			}
+			if (this.sizeScale == "world") {
+				this.screenSize = ZUI.camera.projectDistance(this.size);
+			}
+			else if (this.sizeScale == "screen") {
 				this.screenSize = this.size;
 			}
 			ZUI.context.save();
@@ -802,7 +958,7 @@ ZUI.ViewObject = function(attributes) {
 			ZUI.context.globalAlpha = this.alpha;
 			ZUI.context.font = this.screenSize + "px " + this.font;
 			var screenX, screenY;
-			this.screenWidth = ZUI.context.measureText(this.content);
+			this.screenWidth = ZUI.context.measureText(this.content).width;
 			this.screenHeight = this.screenSize * 0.8;
 			var centerAt = this.centerAt.split(" ");
 			if (centerAt[0] == "left") {
@@ -832,19 +988,25 @@ ZUI.ViewObject = function(attributes) {
 			ZUI.context.restore();
 		}
 		else if (this.shape == "svg" && this.ready) {
-			if (this.scale == "world") {
+			if (this.positionScale == "world") {
 				var position = ZUI.camera.projectPoint(this.x, this.y);
 				this.screenX = position.x;
 				this.screenY = position.y;
 			}
-			else if (this.scale == "screen") {
+			else if (this.positionScale == "screen") {
 				this.screenX = this.x;
 				this.screenY = this.y;
 			}
+			if (this.sizeScale == "world") {
+				this.screenWidth = ZUI.camera.projectDistance(this.width) * this.hscale;
+				this.screenHeight = ZUI.camera.projectDistance(this.height) * this.vscale;
+			}
+			else if (this.sizeScale == "screen") {
+				this.screenWidth = this.width * this.hscale;
+				this.screenHeight = this.height * this.vscale;
+			}
 			ZUI.context.save();
 			var screenX, screenY;
-			this.screenWidth = ZUI.camera.projectDistance(this.image.width) * this.hscale;
-			this.screenHeight = ZUI.camera.projectDistance(this.image.height) * this.vscale;
 			var centerAt = this.centerAt.split(" ");
 			if (centerAt[0] == "left") {
 				screenX = this.screenX;
@@ -865,7 +1027,7 @@ ZUI.ViewObject = function(attributes) {
 				screenY = this.screenY - this.screenHeight;
 			}
 			ZUI.context.translate(screenX, screenY);
-			ZUI.context.scale(this.screenWidth / this.image.width, this.screenHeight / this.image.height);
+			ZUI.context.scale(this.screenWidth / this.width, this.screenHeight / this.height);
 			ZUI.context.drawImage(this.image, 0, 0);
 			ZUI.context.restore();
 		}
@@ -880,13 +1042,28 @@ ZUI.ViewObject = function(attributes) {
 			return true;
 		}
 		else if (this.shape == "circle") {
-			if (Math.pow(x - this.screenX, 2) / Math.pow(this.hradius, 2) + Math.pow(y - this.screenY, 2) / Math.pow(this.vradius, 2)) {
+			if (Math.pow(x - this.screenX, 2) / Math.pow(this.hradius, 2) + Math.pow(y - this.screenY, 2) / Math.pow(this.vradius, 2) <= 1) {
 				return true;
 			}
 			return false;
 		}
 		else if (this.shape == "polygon") {
-			//TODO
+			var intersectCount = 0;
+			var vertex = this.screenVertices[this.screenVertices.length - 1];
+			var x1 = vertex.x + this.screenX;
+			var y1 = vertex.y + this.screenY;
+			for (var n = 0; n < this.screenVertices.length; n++) {
+				vertex = this.screenVertices[n];
+				var x2 = vertex.x + this.screenX;
+				var y2 = vertex.y + this.screenY;
+				var result = ZUI.testRayLineIntersect(x, y, 0, x1, y1, x2, y2);
+				if (result == 2) return true;
+				if (result == 1) intersectCount++;
+				x1 = x2;
+				y1 = y2;
+			}
+			if (intersectCount % 2 == 1) return true;
+			return false;
 		}
 		else if (this.shape == "path") {
 			//TODO
@@ -904,13 +1081,13 @@ ZUI.ViewObject = function(attributes) {
 				screenX = this.screenX - this.screenWidth;
 			}
 			if (centerAt[1] == "top") {
-				screenY = this.screenY + this.screenHeight;
+				screenY = this.screenY;
 			}
 			else if (centerAt[1] == "center") {
-				screenY = this.screenY + this.screenHeight / 2;
+				screenY = this.screenY - this.screenHeight / 2;
 			}
 			else if (centerAt[1] == "bottom") {
-				screenY = this.screenY;
+				screenY = this.screenY - this.screenHeight;
 			}
 			if (x < screenX) return false;
 			if (x > screenX + this.screenWidth) return false;
