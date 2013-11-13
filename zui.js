@@ -115,18 +115,6 @@ ZUI.camera = function() {};
 		ZUI.camera.y = y;
 	};
 
-	/* Sets x immediately DEPRECATED */
-	ZUI.camera.setX = function(x) {
-		ZUI.camera._x = x;
-		ZUI.camera.x = x;
-	};
-
-	/* Sets y immediately DEPRECATED */
-	ZUI.camera.setY = function(y) {
-		ZUI.camera._y = y;
-		ZUI.camera.y = y;
-	};
-
 	/* Sets distance immediately */
 	ZUI.camera.setDistance = function(distance) {
 		ZUI.camera._distance = distance;
@@ -236,6 +224,11 @@ ZUI.initialize = function(settings) {
 		//TODO
 	}
 
+	/* Disable default context menu */
+	ZUI.container.oncontextmenu = function() {
+		return false;
+	};
+
 	/* Set width and height */
 	if (settings.width && settings.height) {
 		ZUI.width = settings.width;
@@ -249,8 +242,8 @@ ZUI.initialize = function(settings) {
 	}
 
 	/* Set background */
-	ZUI.background = (settings.background == undefined) ? "#ffffff" : settings.background;
-	ZUI.backgroundAlpha = (settings.backgroundAlpha == undefined) ? 1 : settings.backgroundAlpha;
+	ZUI.background = (settings.background === undefined) ? "#ffffff" : settings.background;
+	ZUI.backgroundAlpha = (settings.backgroundAlpha === undefined) ? 1 : settings.backgroundAlpha;
 
 	/* Set frame rate */
 	if (settings.frameRate) {
@@ -345,6 +338,27 @@ ZUI.draw = function(timestamp) {
 				ZUI.animation = null;
 			}
 		}
+
+		/* Check for mouse over/out events */
+		var x = ZUI.mouseStatus.x;
+		var y = ZUI.mouseStatus.y;
+		var viewObjects = ZUI.activeView.viewObjects;
+		var viewObject = null;
+		for (var n = 0; n < viewObjects.length; n++) {
+			if (viewObjects[n].isInBound(x, y)) {
+				viewObject = viewObjects[n];
+			}
+			else if (viewObjects[n].isHovered) {
+				viewObjects[n].isHovered = false;
+				viewObjects[n].mouseOut();
+			}
+		}
+		if (viewObject) {
+			if (!viewObject.isHovered) {
+				viewObject.isHovered = true;
+				viewObject.mouseOver();
+			}
+		}
 	}
 };
 
@@ -374,6 +388,7 @@ ZUI.mouseDown = function(event) {
 	for (var n = viewObjects.length - 1; n >= 0; n--) {
 		if (viewObjects[n].isInBound(x, y)) {
 			viewObject = viewObjects[n];
+			break;
 		}
 	}
 	
@@ -406,6 +421,7 @@ ZUI.mouseUp = function(event) {
 	for (var n = viewObjects.length - 1; n >= 0; n--) {
 		if (viewObjects[n].isInBound(x, y)) {
 			viewObject = viewObjects[n];
+			break;
 		}
 	}
 	
@@ -436,7 +452,7 @@ ZUI.mouseMove = function(event) {
 	ZUI.mouseStatus.yLast = ZUI.mouseStatus.y;
 	ZUI.mouseStatus.x = mousePosition.x;
 	ZUI.mouseStatus.y = mousePosition.y;
-	
+
 	var x = ZUI.mouseStatus.x;
 	var y = ZUI.mouseStatus.y;
 	var viewObjects = ZUI.activeView.viewObjects;
@@ -450,7 +466,7 @@ ZUI.mouseMove = function(event) {
 			viewObjects[n].mouseOut();
 		}
 	}
-	
+
 	ZUI.activeView.mouseMove();
 	if (viewObject) {
 		viewObject.mouseMove();
@@ -474,6 +490,7 @@ ZUI.click = function(event) {
 	for (var n = viewObjects.length - 1; n >= 0; n--) {
 		if (viewObjects[n].isInBound(x, y)) {
 			viewObject = viewObjects[n];
+			break;
 		}
 	}
 	
@@ -503,6 +520,7 @@ ZUI.doubleClick = function(event) {
 	for (var n = viewObjects.length - 1; n >= 0; n--) {
 		if (viewObjects[n].isInBound(x, y)) {
 			viewObject = viewObjects[n];
+			break;
 		}
 	}
 	
@@ -530,6 +548,7 @@ ZUI.mouseWheel = function(event) {
 	for (var n = viewObjects.length - 1; n >= 0; n--) {
 		if (viewObjects[n].isInBound(x, y)) {
 			viewObject = viewObjects[n];
+			break;
 		}
 	}
 	
@@ -549,6 +568,7 @@ ZUI.contextMenu = function(event) {
 	for (var n = viewObjects.length - 1; n >= 0; n--) {
 		if (viewObjects[n].isInBound(x, y)) {
 			viewObject = viewObjects[n];
+			break;
 		}
 	}
 	
@@ -636,16 +656,18 @@ ZUI.ViewObject = function(attributes) {
 	/* Set shape and its attributes */
 	if (!attributes.shape) return null;
 	this.shape = attributes.shape;
+	this.x = (attributes.x === undefined) ? 0 : attributes.x;
+	this.y = (attributes.y === undefined) ? 0 : attributes.y;
 	if (this.shape == "rect") {
-		this.x = (attributes.x == undefined) ? 0 : attributes.x;
-		this.y = (attributes.y == undefined) ? 0 : attributes.y;
-		this.width = (attributes.width == undefined) ? 0 : attributes.width;
-		this.height = (attributes.height == undefined) ? 0 : attributes.height;
-		if (attributes.radius == undefined) {
-			this.ltradius = (attributes.ltradius == undefined) ? 0 : attributes.ltradius;
-			this.rtradius = (attributes.rtradius == undefined) ? 0 : attributes.rtradius;
-			this.lbradius = (attributes.lbradius == undefined) ? 0 : attributes.lbradius;
-			this.rbradius = (attributes.rbradius == undefined) ? 0 : attributes.rbradius;
+		this.offsetX = (attributes.offsetX === undefined) ? 0 : attributes.offsetX;
+		this.offsetY = (attributes.offsetY === undefined) ? 0 : attributes.offsetY;
+		this.width = (attributes.width === undefined) ? 0 : attributes.width;
+		this.height = (attributes.height === undefined) ? 0 : attributes.height;
+		if (attributes.radius === undefined) {
+			this.ltradius = (attributes.ltradius === undefined) ? 0 : attributes.ltradius;
+			this.rtradius = (attributes.rtradius === undefined) ? 0 : attributes.rtradius;
+			this.lbradius = (attributes.lbradius === undefined) ? 0 : attributes.lbradius;
+			this.rbradius = (attributes.rbradius === undefined) ? 0 : attributes.rbradius;
 		}
 		else {
 			this.ltradius = attributes.radius;
@@ -653,46 +675,47 @@ ZUI.ViewObject = function(attributes) {
 			this.lbradius = attributes.radius;
 			this.rbradius = attributes.radius;
 		}
-		this.centerAt = (attributes.centerAt == undefined) ? "center center" : attributes.centerAt;
+		this.centerAt = (attributes.centerAt === undefined) ? "center center" : attributes.centerAt;
 	}
 	else if (this.shape == "circle") {
-		this.x = (attributes.x == undefined) ? 0 : attributes.x;
-		this.y = (attributes.y == undefined) ? 0 : attributes.y;
-		if (attributes.radius == undefined) {
-			this.hradius = (attributes.hradius == undefined) ? 0 : attributes.hradius;
-			this.vradius = (attributes.vradius == undefined) ? 0 : attributes.vradius;
+		this.offsetX = (attributes.offsetX === undefined) ? 0 : attributes.offsetX;
+		this.offsetY = (attributes.offsetY === undefined) ? 0 : attributes.offsetY;
+		if (attributes.radius === undefined) {
+			this.hradius = (attributes.hradius === undefined) ? 0 : attributes.hradius;
+			this.vradius = (attributes.vradius === undefined) ? 0 : attributes.vradius;
 		}
 		else {
 			this.hradius = attributes.radius;
 			this.vradius = attributes.radius;
 		}
-		this.centerAt = (attributes.centerAt == undefined) ? "center center" : attributes.centerAt;
+		this.centerAt = (attributes.centerAt === undefined) ? "center center" : attributes.centerAt;
 	}
 	else if (this.shape == "polygon") {
-		this.x = (attributes.x == undefined) ? 0 : attributes.x;
-		this.y = (attributes.y == undefined) ? 0 : attributes.y;
-		this.vertices = (attributes.vertices == undefined) ? [] : attributes.vertices;
+		this.vertices = (attributes.vertices === undefined) ? [] : attributes.vertices;
 	}
 	else if (this.shape == "path") {
-		this.x = (attributes.x == undefined) ? 0 : attributes.x;
-		this.y = (attributes.y == undefined) ? 0 : attributes.y;
-		this.instructions = (attributes.instructions == undefined) ? "" : attributes.instructions;
+		this.vertices = (attributes.vertices === undefined) ? "" : attributes.vertices;
 	}
 	else if (this.shape == "text") {
-		this.x = (attributes.x == undefined) ? 0 : attributes.x;
-		this.y = (attributes.y == undefined) ? 0 : attributes.y;
-		this.size = (attributes.size == undefined) ? 12 : attributes.size;
-		this.font = (attributes.font == undefined) ? "Helvetica" : attributes.font;
-		this.centerAt = (attributes.centerAt == undefined) ? "center center" : attributes.centerAt;
-		this.content = (attributes.content == undefined) ? "" : attributes.content;
+		this.offsetX = (attributes.offsetX === undefined) ? 0 : attributes.offsetX;
+		this.offsetY = (attributes.offsetY === undefined) ? 0 : attributes.offsetY;
+		this.size = (attributes.size === undefined) ? 12 : attributes.size;
+		this.font = (attributes.font === undefined) ? "Helvetica" : attributes.font;
+		this.centerAt = (attributes.centerAt === undefined) ? "center center" : attributes.centerAt;
+		this.content = (attributes.content === undefined) ? "" : attributes.content;
+		ZUI.context.save();
+		ZUI.context.font = this.size + "px " + this.font;
+		this.width = ZUI.context.measureText(this.content).width;
+		this.height = this.size * 0.8;
+		ZUI.context.restore();
 	}
 	else if (this.shape == "svg") {
-		this.x = (attributes.x == undefined) ? 0 : attributes.x;
-		this.y = (attributes.y == undefined) ? 0 : attributes.y;
-		this.hscale = (attributes.hscale == undefined) ? 1 : attributes.hscale;
-		this.vscale = (attributes.vscale == undefined) ? 1 : attributes.vscale;
-		this.centerAt = (attributes.centerAt == undefined) ? "center center" : attributes.centerAt;
-		this.url = (attributes.url == undefined) ? "" : attributes.url;
+		this.offsetX = (attributes.offsetX === undefined) ? 0 : attributes.offsetX;
+		this.offsetY = (attributes.offsetY === undefined) ? 0 : attributes.offsetY;
+		this.hscale = (attributes.hscale === undefined) ? 1 : attributes.hscale;
+		this.vscale = (attributes.vscale === undefined) ? 1 : attributes.vscale;
+		this.centerAt = (attributes.centerAt === undefined) ? "center center" : attributes.centerAt;
+		this.url = (attributes.url === undefined) ? "" : attributes.url;
 		this.ready = false;
 		$.ajax({
 			type: "GET",
@@ -714,40 +737,43 @@ ZUI.ViewObject = function(attributes) {
 	else return null;
 
 	/* Set stroke and fill */
-	this.stroke = (attributes.stroke == undefined) ? true : attributes.stroke;
-	this.strokeColor = (attributes.strokeColor == undefined) ? "#000000" : attributes.strokeColor;
-	this.strokeWidth = (attributes.strokeWidth == undefined) ? 1 : attributes.strokeWidth;
-	this.fill = (attributes.fill == undefined) ? true : attributes.fill;
-	this.fillColor = (attributes.fillColor == undefined) ? "#000000" : attributes.fillColor;
-	this.alpha = (attributes.alpha == undefined) ? 1 : attributes.alpha;
+	this.stroke = (attributes.stroke === undefined) ? true : attributes.stroke;
+	this.strokeColor = (attributes.strokeColor === undefined) ? "#000000" : attributes.strokeColor;
+	this.strokeWidth = (attributes.strokeWidth === undefined) ? 1 : attributes.strokeWidth;
+	this.fill = (attributes.fill === undefined) ? true : attributes.fill;
+	this.fillColor = (attributes.fillColor === undefined) ? "#000000" : attributes.fillColor;
+	this.alpha = (attributes.alpha === undefined) ? 1 : attributes.alpha;
 
 	/* Set scale */
-	this.positionScale = (attributes.positionScale == undefined) ? "world" : attributes.positionScale;
-	this.sizeScale = (attributes.sizeScale == undefined) ? "world" : attributes.sizeScale;
+	this.positionScale = (attributes.positionScale === undefined) ? "world" : attributes.positionScale;
+	this.sizeScale = (attributes.sizeScale === undefined) ? "world" : attributes.sizeScale;
 
 	/* Set autoDraw option */
-	this.autoDraw = (attributes.autoDraw == undefined) ? false : attributes.autoDraw;
+	this.autoDraw = (attributes.autoDraw === undefined) ? false : attributes.autoDraw;
 	
 	/* Initialize hover state */
 	this.isHovered = false;
+
+	/* On screen status */
+	this.isOnScreen = false;
 	
 	/* Define event handlers */
-	this.leftMouseDown = (attributes.leftMouseDown == undefined) ? function() {} : attributes.leftMouseDown;
-	this.middleMouseDown = (attributes.middleMouseDown == undefined) ? function() {} : attributes.middleMouseDown;
-	this.rightMouseDown = (attributes.rightMouseDown == undefined) ? function() {} : attributes.rightMouseDown;
-	this.leftMouseUp = (attributes.leftMouseUp == undefined) ? function() {} : attributes.leftMouseUp;
-	this.middleMouseUp = (attributes.middleMouseUp == undefined) ? function() {} : attributes.middleMouseUp;
-	this.rightMouseUp = (attributes.rightMouseUp == undefined) ? function() {} : attributes.rightMouseUp;
-	this.mouseMove = (attributes.mouseMove == undefined) ? function() {} : attributes.mouseMove;
-	this.leftClick = (attributes.leftClick == undefined) ? function() {} : attributes.leftClick;
-	this.middleClick = (attributes.middleClick == undefined) ? function() {} : attributes.middleClick;
-	this.rightClick = (attributes.rightClick == undefined) ? function() {} : attributes.rightClick;
-	this.leftDoubleClick = (attributes.leftDoubleClick == undefined) ? function() {} : attributes.leftDoubleClick;
-	this.middleDoubleClick = (attributes.middleDoubleClick == undefined) ? function() {} : attributes.middleDoubleClick;
-	this.mouseWheel = (attributes.mouseWheel == undefined) ? function() {} : attributes.mouseWheel;
-	this.contextMenu = (attributes.contextMenu == undefined) ? function() {} : attributes.contextMenu;
-	this.mouseOver = (attributes.mouseOver == undefined) ? function() {} : attributes.mouseOver;
-	this.mouseOut = (attributes.mouseOut == undefined) ? function() {} : attributes.mouseOut;
+	this.leftMouseDown = (attributes.leftMouseDown === undefined) ? function() {} : attributes.leftMouseDown;
+	this.middleMouseDown = (attributes.middleMouseDown === undefined) ? function() {} : attributes.middleMouseDown;
+	this.rightMouseDown = (attributes.rightMouseDown === undefined) ? function() {} : attributes.rightMouseDown;
+	this.leftMouseUp = (attributes.leftMouseUp === undefined) ? function() {} : attributes.leftMouseUp;
+	this.middleMouseUp = (attributes.middleMouseUp === undefined) ? function() {} : attributes.middleMouseUp;
+	this.rightMouseUp = (attributes.rightMouseUp === undefined) ? function() {} : attributes.rightMouseUp;
+	this.mouseMove = (attributes.mouseMove === undefined) ? function() {} : attributes.mouseMove;
+	this.leftClick = (attributes.leftClick === undefined) ? function() {} : attributes.leftClick;
+	this.middleClick = (attributes.middleClick === undefined) ? function() {} : attributes.middleClick;
+	this.rightClick = (attributes.rightClick === undefined) ? function() {} : attributes.rightClick;
+	this.leftDoubleClick = (attributes.leftDoubleClick === undefined) ? function() {} : attributes.leftDoubleClick;
+	this.middleDoubleClick = (attributes.middleDoubleClick === undefined) ? function() {} : attributes.middleDoubleClick;
+	this.mouseWheel = (attributes.mouseWheel === undefined) ? function() {} : attributes.mouseWheel;
+	this.contextMenu = (attributes.contextMenu === undefined) ? function() {} : attributes.contextMenu;
+	this.mouseOver = (attributes.mouseOver === undefined) ? function() {} : attributes.mouseOver;
+	this.mouseOut = (attributes.mouseOut === undefined) ? function() {} : attributes.mouseOut;
 };
 
 	ZUI.ViewObject.prototype.draw = function() {
@@ -762,6 +788,8 @@ ZUI.ViewObject = function(attributes) {
 				this.screenY = this.y;
 			}
 			if (this.sizeScale == "world") {
+				this.screenOffsetX = ZUI.camera.projectDistance(this.offsetX);
+				this.screenOffsetY = ZUI.camera.projectDistance(this.offsetY);
 				this.screenWidth = ZUI.camera.projectDistance(this.width);
 				this.screenHeight = ZUI.camera.projectDistance(this.height);
 				this.screenLtradius = ZUI.camera.projectDistance(this.ltradius);
@@ -770,6 +798,8 @@ ZUI.ViewObject = function(attributes) {
 				this.screenRbradius = ZUI.camera.projectDistance(this.rbradius);
 			}
 			else if (this.sizeScale == "screen") {
+				this.screenOffsetX = this.offsetX;
+				this.screenOffsetY = this.offsetY;
 				this.screenWidth = this.width;
 				this.screenHeight = this.height;
 				this.screenLtradius = this.ltradius;
@@ -793,23 +823,25 @@ ZUI.ViewObject = function(attributes) {
 			var screenX, screenY;
 			var centerAt = this.centerAt.split(" ");
 			if (centerAt[0] == "left") {
-				screenX = this.screenX;
+				screenX = 0;
 			}
 			else if (centerAt[0] == "center") {
-				screenX = this.screenX - this.screenWidth / 2;
+				screenX = -this.screenWidth / 2;
 			}
 			else if (centerAt[0] == "right") {
-				screenX = this.screenX - this.screenWidth;
+				screenX = -this.screenWidth;
 			}
+			screenX += this.screenX + this.screenOffsetX;
 			if (centerAt[1] == "top") {
-				screenY = this.screenY;
+				screenY = 0;
 			}
 			else if (centerAt[1] == "center") {
-				screenY = this.screenY - this.screenHeight / 2;
+				screenY = -this.screenHeight / 2;
 			}
 			else if (centerAt[1] == "bottom") {
-				screenY = this.screenY - this.screenHeight;
+				screenY = -this.screenHeight;
 			}
+			screenY += this.screenY + this.screenOffsetY;
 			ZUI.context.beginPath();
 			ZUI.context.moveTo(screenX + this.screenLtradius, screenY);
 			ZUI.context.arcTo(screenX + this.screenWidth, screenY, screenX + this.screenWidth, screenY + this.screenHeight, this.screenRtradius);
@@ -824,6 +856,7 @@ ZUI.ViewObject = function(attributes) {
 				ZUI.context.fill();
 			}
 			ZUI.context.restore();
+			this.isOnScreen = true;
 		}
 		else if (this.shape == "circle") {
 			if (this.positionScale == "world") {
@@ -836,10 +869,14 @@ ZUI.ViewObject = function(attributes) {
 				this.screenY = this.y;
 			}
 			if (this.sizeScale == "world") {
+				this.screenOffsetX = ZUI.camera.projectDistance(this.offsetX);
+				this.screenOffsetY = ZUI.camera.projectDistance(this.offsetY);
 				this.screenHradius = ZUI.camera.projectDistance(this.hradius);
 				this.screenVradius = ZUI.camera.projectDistance(this.vradius);
 			}
 			else if (this.sizeScale == "screen") {
+				this.screenOffsetX = this.offsetX;
+				this.screenOffsetY = this.offsetY;
 				this.screenHradius = this.hradius;
 				this.screenVradius = this.vradius;
 			}
@@ -851,23 +888,25 @@ ZUI.ViewObject = function(attributes) {
 			var screenX, screenY;
 			var centerAt = this.centerAt.split(" ");
 			if (centerAt[0] == "left") {
-				screenX = this.screenX + this.screenHradius / 2;
+				screenX = this.screenHradius / 2;
 			}
 			else if (centerAt[0] == "center") {
-				screenX = this.screenX;
+				screenX = 0;
 			}
 			else if (centerAt[0] == "right") {
-				screenX = this.screenX - this.screenHradius / 2;
+				screenX = -this.screenHradius / 2;
 			}
+			screenX += this.screenX + this.screenOffsetX;
 			if (centerAt[1] == "top") {
-				screenY = this.screenY + this.screenVradius / 2;
+				screenY = this.screenVradius / 2;
 			}
 			else if (centerAt[1] == "center") {
-				screenY = this.screenY;
+				screenY = 0;
 			}
 			else if (centerAt[1] == "bottom") {
-				screenY = this.screenY - this.screenVradius / 2;
+				screenY = -this.screenVradius / 2;
 			}
+			screenY += this.screenY + this.screenOffsetY;
 			ZUI.context.save();
 			ZUI.context.translate(screenX, screenY);
 			ZUI.context.scale(this.screenHradius, this.screenVradius);
@@ -882,6 +921,7 @@ ZUI.ViewObject = function(attributes) {
 				ZUI.context.fill();
 			}
 			ZUI.context.restore();
+			this.isOnScreen = true;
 		}
 		else if (this.shape == "polygon") {
 			if (this.positionScale == "world") {
@@ -931,9 +971,53 @@ ZUI.ViewObject = function(attributes) {
 				ZUI.context.fill();
 			}
 			ZUI.context.restore();
+			this.isOnScreen = true;
 		}
 		else if (this.shape == "path") {
-			//TODO
+			if (this.positionScale == "world") {
+				var position = ZUI.camera.projectPoint(this.x, this.y);
+				this.screenX = position.x;
+				this.screenY = position.y;
+			}
+			else if (this.positionScale == "screen") {
+				this.screenX = this.x;
+				this.screenY = this.y;
+			}
+			if (this.sizeScale == "world") {
+				this.screenVertices = [];
+				for (var n = 0; n < this.vertices.length; n++) {
+					this.screenVertices.push({
+						x: ZUI.camera.projectDistance(this.vertices[n].x),
+						y: ZUI.camera.projectDistance(this.vertices[n].y)
+					});
+				}
+			}
+			else if (this.sizeScale == "screen") {
+				this.screenVertices = [];
+				for (var n = 0; n < this.vertices.length; n++) {
+					this.screenVertices.push({
+						x: this.vertices[n].x,
+						y: this.vertices[n].y
+					});
+				}
+			}
+
+			ZUI.context.save();
+			ZUI.context.strokeStyle = this.strokeColor;
+			ZUI.context.lineWidth = this.strokeWidth;
+			ZUI.context.globalAlpha = this.alpha;
+			ZUI.context.translate(this.screenX, this.screenY);
+			ZUI.context.beginPath();
+			ZUI.context.moveTo(this.screenVertices[0].x, this.screenVertices[0].y);
+			for (var n = 1; n < this.screenVertices.length; n++) {
+				ZUI.context.lineTo(this.screenVertices[n].x, this.screenVertices[n].y);
+			}
+			if (this.stroke) {
+				ZUI.context.stroke();
+			}
+			ZUI.context.closePath();
+			ZUI.context.restore();
+			this.isOnScreen = true;
 		}
 		else if (this.shape == "text") {
 			if (this.positionScale == "world") {
@@ -946,10 +1030,18 @@ ZUI.ViewObject = function(attributes) {
 				this.screenY = this.y;
 			}
 			if (this.sizeScale == "world") {
+				this.screenOffsetX = ZUI.camera.projectDistance(this.offsetX);
+				this.screenOffsetY = ZUI.camera.projectDistance(this.offsetY);
 				this.screenSize = ZUI.camera.projectDistance(this.size);
+				this.screenWidth = ZUI.camera.projectDistance(this.width);
+				this.screenHeight = ZUI.camera.projectDistance(this.height);
 			}
 			else if (this.sizeScale == "screen") {
+				this.screenOffsetX = this.offsetX;
+				this.screenOffsetY = this.offsetY;
 				this.screenSize = this.size;
+				this.screenWidth = this.width;
+				this.screenHeight = this.height;
 			}
 			ZUI.context.save();
 			ZUI.context.strokeStyle = this.strokeColor;
@@ -958,27 +1050,27 @@ ZUI.ViewObject = function(attributes) {
 			ZUI.context.globalAlpha = this.alpha;
 			ZUI.context.font = this.screenSize + "px " + this.font;
 			var screenX, screenY;
-			this.screenWidth = ZUI.context.measureText(this.content).width;
-			this.screenHeight = this.screenSize * 0.8;
 			var centerAt = this.centerAt.split(" ");
 			if (centerAt[0] == "left") {
-				screenX = this.screenX;
+				screenX = 0;
 			}
 			else if (centerAt[0] == "center") {
-				screenX = this.screenX - this.screenWidth / 2;
+				screenX = -this.screenWidth / 2;
 			}
 			else if (centerAt[0] == "right") {
-				screenX = this.screenX - this.screenWidth;
+				screenX = -this.screenWidth;
 			}
+			screenX += this.screenX + this.screenOffsetX;
 			if (centerAt[1] == "top") {
-				screenY = this.screenY + this.screenHeight;
+				screenY = 0;
 			}
 			else if (centerAt[1] == "center") {
-				screenY = this.screenY + this.screenHeight / 2;
+				screenY = this.screenHeight / 2;
 			}
 			else if (centerAt[1] == "bottom") {
-				screenY = this.screenY;
+				screenY = this.screenHeight;
 			}
+			screenY += this.screenY + this.screenOffsetY;
 			if (this.fill) {
 				ZUI.context.fillText(this.content, screenX, screenY);
 			}
@@ -986,6 +1078,7 @@ ZUI.ViewObject = function(attributes) {
 				ZUI.context.strokeText(this.content, screenX, screenY);
 			}
 			ZUI.context.restore();
+			this.isOnScreen = true;
 		}
 		else if (this.shape == "svg" && this.ready) {
 			if (this.positionScale == "world") {
@@ -998,10 +1091,14 @@ ZUI.ViewObject = function(attributes) {
 				this.screenY = this.y;
 			}
 			if (this.sizeScale == "world") {
+				this.screenOffsetX = ZUI.camera.projectDistance(this.offsetX);
+				this.screenOffsetY = ZUI.camera.projectDistance(this.offsetY);
 				this.screenWidth = ZUI.camera.projectDistance(this.width) * this.hscale;
 				this.screenHeight = ZUI.camera.projectDistance(this.height) * this.vscale;
 			}
 			else if (this.sizeScale == "screen") {
+				this.screenOffsetX = this.offsetX;
+				this.screenOffsetY = this.offsetY;
 				this.screenWidth = this.width * this.hscale;
 				this.screenHeight = this.height * this.vscale;
 			}
@@ -1009,40 +1106,88 @@ ZUI.ViewObject = function(attributes) {
 			var screenX, screenY;
 			var centerAt = this.centerAt.split(" ");
 			if (centerAt[0] == "left") {
-				screenX = this.screenX;
+				screenX = 0;
 			}
 			else if (centerAt[0] == "center") {
-				screenX = this.screenX - this.screenWidth / 2;
+				screenX =  -this.screenWidth / 2;
 			}
 			else if (centerAt[0] == "right") {
-				screenX = this.screenX - this.screenWidth;
+				screenX = -this.screenWidth;
 			}
+			screenX += this.screenX + this.screenOffsetX;
 			if (centerAt[1] == "top") {
-				screenY = this.screenY;
+				screenY = 0;
 			}
 			else if (centerAt[1] == "center") {
-				screenY = this.screenY - this.screenHeight / 2;
+				screenY = -this.screenHeight / 2;
 			}
 			else if (centerAt[1] == "bottom") {
-				screenY = this.screenY - this.screenHeight;
+				screenY = -this.screenHeight;
 			}
+			screenY += this.screenY + this.screenOffsetY;
 			ZUI.context.translate(screenX, screenY);
 			ZUI.context.scale(this.screenWidth / this.width, this.screenHeight / this.height);
 			ZUI.context.drawImage(this.image, 0, 0);
 			ZUI.context.restore();
+			this.isOnScreen = true;
 		}
 	};
 	
 	ZUI.ViewObject.prototype.isInBound = function(x, y) {
+		if (!this.isOnScreen) return false;
 		if (this.shape == "rect") {
-			if (x < this.screenX) return false;
-			if (x > this.screenX + this.screenWidth) return false;
-			if (y < this.screenY) return false;
-			if (y > this.screenY + this.screenHeight) return false;
+			var screenX, screenY;
+			var centerAt = this.centerAt.split(" ");
+			if (centerAt[0] == "left") {
+				screenX = 0;
+			}
+			else if (centerAt[0] == "center") {
+				screenX =  -this.screenWidth / 2;
+			}
+			else if (centerAt[0] == "right") {
+				screenX = -this.screenWidth;
+			}
+			screenX += this.screenX + this.screenOffsetX;
+			if (centerAt[1] == "top") {
+				screenY = 0;
+			}
+			else if (centerAt[1] == "center") {
+				screenY = -this.screenHeight / 2;
+			}
+			else if (centerAt[1] == "bottom") {
+				screenY = -this.screenHeight;
+			}
+			screenY += this.screenY + this.screenOffsetY;
+			if (x < screenX) return false;
+			if (x > screenX + this.screenWidth) return false;
+			if (y < screenY) return false;
+			if (y > screenY + this.screenHeight) return false;
 			return true;
 		}
 		else if (this.shape == "circle") {
-			if (Math.pow(x - this.screenX, 2) / Math.pow(this.hradius, 2) + Math.pow(y - this.screenY, 2) / Math.pow(this.vradius, 2) <= 1) {
+			var screenX, screenY;
+			var centerAt = this.centerAt.split(" ");
+			if (centerAt[0] == "left") {
+				screenX = this.screenHradius / 2;
+			}
+			else if (centerAt[0] == "center") {
+				screenX = 0;
+			}
+			else if (centerAt[0] == "right") {
+				screenX = -this.screenHradius / 2;
+			}
+			screenX += this.screenX + this.screenOffsetX;
+			if (centerAt[1] == "top") {
+				screenY = this.screenVradius / 2;
+			}
+			else if (centerAt[1] == "center") {
+				screenY = 0;
+			}
+			else if (centerAt[1] == "bottom") {
+				screenY = -this.screenVradius / 2;
+			}
+			screenY += this.screenY + this.screenOffsetY;
+			if (Math.pow(x - screenX, 2) / Math.pow(this.hradius, 2) + Math.pow(y - screenY, 2) / Math.pow(this.vradius, 2) <= 1) {
 				return true;
 			}
 			return false;
@@ -1065,30 +1210,29 @@ ZUI.ViewObject = function(attributes) {
 			if (intersectCount % 2 == 1) return true;
 			return false;
 		}
-		else if (this.shape == "path") {
-			//TODO
-		}
 		else if (this.shape == "text") {
 			var screenX, screenY;
 			var centerAt = this.centerAt.split(" ");
 			if (centerAt[0] == "left") {
-				screenX = this.screenX;
+				screenX = 0;
 			}
 			else if (centerAt[0] == "center") {
-				screenX = this.screenX - this.screenWidth / 2;
+				screenX = -this.screenWidth / 2;
 			}
 			else if (centerAt[0] == "right") {
-				screenX = this.screenX - this.screenWidth;
+				screenX = -this.screenWidth;
 			}
+			screenX += this.screenX + this.screenOffsetX;
 			if (centerAt[1] == "top") {
-				screenY = this.screenY;
+				screenY = 0;
 			}
 			else if (centerAt[1] == "center") {
-				screenY = this.screenY - this.screenHeight / 2;
+				screenY = -this.screenHeight / 2;
 			}
 			else if (centerAt[1] == "bottom") {
-				screenY = this.screenY - this.screenHeight;
+				screenY = -this.screenHeight;
 			}
+			screenY += this.screenY + this.screenOffsetY;
 			if (x < screenX) return false;
 			if (x > screenX + this.screenWidth) return false;
 			if (y < screenY) return false;
@@ -1099,23 +1243,25 @@ ZUI.ViewObject = function(attributes) {
 			var screenX, screenY;
 			var centerAt = this.centerAt.split(" ");
 			if (centerAt[0] == "left") {
-				screenX = this.screenX;
+				screenX = 0;
 			}
 			else if (centerAt[0] == "center") {
-				screenX = this.screenX - this.screenWidth / 2;
+				screenX =  -this.screenWidth / 2;
 			}
 			else if (centerAt[0] == "right") {
-				screenX = this.screenX - this.screenWidth;
+				screenX = -this.screenWidth;
 			}
+			screenX += this.screenX + this.screenOffsetX;
 			if (centerAt[1] == "top") {
-				screenY = this.screenY;
+				screenY = 0;
 			}
 			else if (centerAt[1] == "center") {
-				screenY = this.screenY - this.screenHeight / 2;
+				screenY = -this.screenHeight / 2;
 			}
 			else if (centerAt[1] == "bottom") {
-				screenY = this.screenY - this.screenHeight;
+				screenY = -this.screenHeight;
 			}
+			screenY += this.screenY + this.screenOffsetY;
 			if (x < screenX) return false;
 			if (x > screenX + this.screenWidth) return false;
 			if (y < screenY) return false;
