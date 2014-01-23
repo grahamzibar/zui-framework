@@ -185,7 +185,7 @@ SimpleView.prototype.remove = function() {
 };
 ```
 
-The ZUI framework automatically keeps a reference to each ViewObject created. If a ViewObject is no longer in use, its ```remove()``` method must be called to prevent memory leak.
+The ZUI framework automatically keeps a reference of each ViewObject created. If a ViewObject is no longer in use, its ```remove()``` method must be called to prevent memory leak.
 
 Controlling the camera
 -------------
