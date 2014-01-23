@@ -96,7 +96,7 @@ There are several types of ViewObjects:<br>
 ```text```: Text.<br>
 ```multilinetext```: Text that supports the newline character "\n".<br>
 ```svg```: Scalable Vector Graphics.<br>
-```advshape```: Complex shape with straight and/or curved edges defined by a path string.<br>
+```advshape```: Complex shape with straight and/or curved edges defined by a path string.
 
 Controlling the camera
 -------------
