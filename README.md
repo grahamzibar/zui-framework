@@ -116,66 +116,66 @@ var myViewObject = new ZUI.ViewObject({
 All the available attributes for each ViewObject type is listed below:
 ```
 General
-	positionScale
-	sizeScale
-	autoDraw
-	x
-	y
-	offsetX
-	offsetY
-	stroke
-	strokeColor
-	strokeWidth
-	fill
-	fillColor
-	alpha
-	centerAt
+	positionScale: Scaling option of the ViewObject position. Can be "world" or "screen".
+	sizeScale: Scaling option of the ViewObject size. Can be "world" or "screen".
+	autoDraw: Boolean value indicating whether to draw the ViewObject automatically. Must be inserted to the View's viewObjects array for this to work.
+	x: x position of the ViewObject.
+	y: y position of the ViewObject.
+	offsetX: x position offset of the ViewObject. Affected by sizeScale.
+	offsetY: y position offset of the ViewObject. Affected by sizeScale.
+	stroke: Boolean value indicating whether to stroke the ViewObject.
+	strokeColor: Stroke color of the ViewObject.
+	strokeWidth: Stroke width of the ViewObject.
+	fill: Boolean value indicating whether to fill the ViewObject.
+	fillColor: Fill color of the ViewObject.
+	alpha: Alpha of the ViewObject, for controlling transparency (0 to 1, inclusive).
+	centerAt: Point of the ViewObject to be aligned with the position coordinates. Made of two words separated by space. The first word can be "left", "center" or "right". The second word can be "top", "center" or "bottom". Example: "left top".
 
 rect
-	width
-	height
-	radius
-	ltradius
-	rtradius
-	lbradius
-	rbradius
+	width: Width of the rectangle.
+	height: Height of the rectangle.
+	radius: Radius of the rectangle corners.
+	ltradius: Radius of the top left corner.
+	rtradius: Radius of the top right corner.
+	lbradius: Radius of the bottom left corner.
+	rbradius: Radius of the bottom right corner.
 
 circle
-	radius
-	hradius
-	vradius
+	radius: Radius of the circle.
+	hradius: Horizontal radius of the circle or ellipse.
+	vradius: Vertical radius of the circle or ellipse.
 
 polygon
-	vertices
+	vertices: Array of vertices (objects with x and y attributes) that define the polygon.
 
 path
-	vertices
+	vertices: Array of vertices (objects with x and y attributes) that define the path.
 
 text
-	size
-	font
-	bold
-	italic
-	underline
-	content
+	size: Font size.
+	font: Font style.
+	bold: Boolean value indicating whether text is bolded.
+	italic: Boolean value indicating whether text is italic.
+	underline: Boolean value indicating whether text is underlined.
+	content: Content of the text.
 
 multilinetext
-	size
-	font
-	bold
-	italic
-	underline
-	content
+	size: Font size.
+	font: Font style.
+	bold: Boolean value indicating whether text is bolded.
+	italic: Boolean value indicating whether text is italic.
+	underline: Boolean value indicating whether text is underlined.
+	content: Content of the text. Supports the newline character "\n".
 
 svg
-	width
-	height
-	hscale
-	vscale
-	url
+	width: Width of the SVG.
+	height: Height of the SVG.
+	hscale: Horizontal scale of the SVG.
+	vscale: Vertical scale of the SVG.
+	url: URL of the SVG file.
 
 advshape
-	paths
+	paths: Array of path strings defining the shape. The path string should be a valid SVG path string. Note arcs are modified from the SVG standard, with x1, y1, x2, y2, and r as parameters. x1 and y1 define the coordinates of the beginning of the arc. x2 and y2 define the coordinates of the end of the arc. r defines the radius of the arc.
 ```
 
 To "add" a ViewObject to a View, simply keep a reference of the ViewObject and draw the ViewObject in the View's ```draw``` callback method. To demonstrate:
