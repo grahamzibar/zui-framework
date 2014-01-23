@@ -97,7 +97,7 @@ There are several types of ViewObjects:<br>
 ```svg```: Scalable Vector Graphics.<br>
 ```advshape```: Complex shape with straight and/or curved edges defined by a path string.
 
-The ```ZUI.ViewObject``` class constructor can be called to create a ViewObject instance. Attributes of the ViewObject can be passed to the constructor in a wrapped object. For a complete list of the available attributes, please see the documentation for the ```ZUI.ViewObject``` class. The following example creates a new ViewObject of type ```circle```:
+The ```ZUI.ViewObject``` class constructor can be called to create a ViewObject instance. Attributes of the ViewObject can be passed to the constructor in a wrapped object. The following example creates a new ViewObject of type ```circle```:
 ```
 var myViewObject = new ZUI.ViewObject({
 	shape: "circle",
@@ -111,6 +111,71 @@ var myViewObject = new ZUI.ViewObject({
 	strokeColor: "#FF0000",
 	fillColor: "#00FFFF"
 });
+```
+
+All the available attributes for each ViewObject type is listed below:
+```
+General
+	positionScale
+	sizeScale
+	autoDraw
+	x
+	y
+	offsetX
+	offsetY
+	stroke
+	strokeColor
+	strokeWidth
+	fill
+	fillColor
+	alpha
+	centerAt
+
+rect
+	width
+	height
+	radius
+	ltradius
+	rtradius
+	lbradius
+	rbradius
+
+circle
+	radius
+	hradius
+	vradius
+
+polygon
+	vertices
+
+path
+	vertices
+
+text
+	size
+	font
+	bold
+	italic
+	underline
+	content
+
+multilinetext
+	size
+	font
+	bold
+	italic
+	underline
+	content
+
+svg
+	width
+	height
+	hscale
+	vscale
+	url
+
+advshape
+	paths
 ```
 
 To "add" a ViewObject to a View, simply keep a reference of the ViewObject and draw the ViewObject in the View's ```draw``` callback method. To demonstrate:
