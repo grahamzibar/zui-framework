@@ -98,6 +98,95 @@ There are several types of ViewObjects:<br>
 ```svg```: Scalable Vector Graphics.<br>
 ```advshape```: Complex shape with straight and/or curved edges defined by a path string.
 
+The ```ZUI.ViewObject``` class constructor can be called to create a ViewObject instance. Attributes of the ViewObject can be passed to the constructor in a wrapped object. For a complete list of the available attributes, please see the documentation for the ```ZUI.ViewObject``` class. The following example creates a new ViewObject of type ```circle```:
+```
+var myViewObject = new ZUI.ViewObject({
+	shape: "circle",
+	positionScale: "screen",
+	sizeScale: "screen",
+	x: 200,
+	y: 200,
+	radius: 100,
+	centerAt: "center center",
+	strokeWidth: 3,
+	strokeColor: "#FF0000",
+	fillColor: "#00FFFF"
+});
+```
+
+To "add" a ViewObject to a View, simply keep a reference of the ViewObject and draw the ViewObject in the View's ```draw``` callback method. To demonstrate:
+```
+/* Class constructor */
+function SimpleView() {
+	ZUI.View.call(this);	// Call parent constructor
+	
+	/* Create a ViewObject */
+	this.myCircle = new ZUI.ViewObject({
+		shape: "circle",
+		positionScale: "screen",
+		sizeScale: "screen",
+		x: 200,
+		y: 200,
+		radius: 100,
+		centerAt: "center center",
+		strokeWidth: 3,
+		strokeColor: "#FF0000",
+		fillColor: "#00FFFF"
+	});
+}
+ZUI.Util.inheritClass(ZUI.View, SimpleView);	// Inherit parent prototype
+
+/* Override draw callback method */
+SimpleView.prototype.draw = function() {
+	/* Draw our ViewObject */
+	this.myCircle.draw();
+};
+```
+
+Although the above code is sufficient for drawing a ViewObject, we may also want to keep track of user inputs targeted at the ViewObject. To let the ZUI framework know that a ViewObject is expecting user inputs, simply append the ViewObject to the View's ```viewObjects``` array property and define a callback function for the input event. The following code allows the ViewObject to respond to left click events.
+```
+/* Class constructor */
+function SimpleView() {
+	ZUI.View.call(this);	// Call parent constructor
+	
+	/* Create a ViewObject */
+	this.myCircle = new ZUI.ViewObject({
+		shape: "circle",
+		positionScale: "screen",
+		sizeScale: "screen",
+		x: 200,
+		y: 200,
+		radius: 100,
+		centerAt: "center center",
+		strokeWidth: 3,
+		strokeColor: "#FF0000",
+		fillColor: "#00FFFF",
+		leftClick: function() {
+			if (this.radius == 100) this.radius = 150;
+			else this.radius = 100;
+		}
+	});
+	
+	/* Append our ViewObject to the viewObjects array so that we can keep track of its user inputs */
+	this.viewObjects.push(this.myCircle);
+}
+ZUI.Util.inheritClass(ZUI.View, SimpleView);	// Inherit parent prototype
+
+/* Override draw callback method */
+SimpleView.prototype.draw = function() {
+	/* Draw our ViewObject */
+	this.myCircle.draw();
+};
+
+/* Override remove callback method */
+SimpleView.prototype.remove = function() {
+	/* Remove our ViewObject to prevent memory leak */
+	this.myCircle.remove();
+};
+```
+
+The ZUI framework automatically keeps a reference to each ViewObject created. If a ViewObject is no longer in use, its ```remove()``` method must be called to prevent memory leak.
+
 Controlling the camera
 -------------
 
