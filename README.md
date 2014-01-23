@@ -28,7 +28,7 @@ ZUI.initialize({
 
 Creating a View
 -------------
-The ZUI framework is driven by Views. A ZUI View is an object with various callback methods defined so that the ZUI framework can tell the View about what the View should respond to. How the View responds depends on how the callback method id defined.
+The ZUI framework is driven by Views. A ZUI View is an object with various callback methods defined so that the ZUI framework can tell the View about what the View should respond to. How the View responds depends on how the corresponding callback method is defined.
 
 The main callback methods of a View are:<br>
 ```active()```: This method is called when the View becomes active. There can only be one active View at any given time.<br>
