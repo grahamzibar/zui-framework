@@ -86,7 +86,17 @@ There are also callback methods available for user input events. These callback 
 
 Adding ViewObjects to a View
 -------------
+ViewObjects are objects that get drawn on the ZUI canvas.
 
+There are several types of ViewObjects:<br>
+```rect```: Rectangle with support for round edges.<br>
+```circle```: Circle or ellipse with horizontal and vertical radius.<br>
+```polygon```: Polygon with straight edges connecting multiple vertices.<br>
+```path```: Line connecting several vertices.<br>
+```text```: Text.<br>
+```multilinetext```: Text that supports the newline character "\n".<br>
+```svg```: Scalable Vector Graphics.<br>
+```advshape```: Complex shape with straight and/or curved edges defined by a path string.<br>
 
 Controlling the camera
 -------------
