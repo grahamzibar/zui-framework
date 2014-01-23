@@ -10,6 +10,17 @@
 	window.requestAnimationFrame = requestAnimationFrame;
 })();
 
+/* Define String.prototype.indexOf if undefined */
+(function() {
+	if (!String.prototype.indexOf) {
+		String.prototype.indexOf = function(obj, start) {
+			for (var n = (start || 0), length = this.length; i < length; i++) {
+				if (this[n] === obj) return n;
+			}
+		};
+	}
+})();
+
 /* ZUI namespace */
 var ZUI = {};
 
@@ -21,22 +32,24 @@ ZUI.frameRate = 60;			// Frame rate
 ZUI.lastTimestamp = 0;		// Last timestamp taken
 ZUI.width = 900;			// Canvas width
 ZUI.height = 600;			// Canvas height
-ZUI.animation = null;		// Active animation
 ZUI.activeView = null;		// Active view
-ZUI.isChangeView = false;		// Whether view should be changed
-ZUI.isAnimateChangeView = true;	// Whether view change should be animated
-ZUI.oldView = null;			// View before view change
-ZUI.exitOldViewAnimation = null;	// Animation for exiting old view
-ZUI.newView = null;			// View after view change
-ZUI.enterNewViewAnimation = null;	// Animation for entering new view
+ZUI.viewObjects = [];		// All view objects
+ZUI.customContextMenu = null;	// Custom context menu
 ZUI.mouseStatus = {			// Mouse status
-	x : 0,
-	y : 0,
-	xLast : 0,
-	yLast : 0,
-	leftDown : false,
-	middleDown : false,
-	rightDown : false,
+	x: 0,
+	y: 0,
+	xLast: 0,
+	yLast: 0,
+	leftDown: false,
+	middleDown: false,
+	rightDown: false,
+};
+ZUI.touchStatus = {			// Touch status
+	pointers: [],			// Touch pointers
+	isPinch: false,		// Whether screen is being pinched with two pointers
+	isRotate: false,		// Whether screen is being rotated with two fingers
+	lastZoom: 0,			// Zoom at start of pinch
+	lastRotation: 0		// Rotation at start of rotate
 };
 ZUI.appStatus = {			// Application status
 	start: 0,
@@ -48,13 +61,22 @@ ZUI.background = {			// Background color
 	blue : 255,
 	alpha : 0
 };
+ZUI.eventListeners = null;		// Event listeners hash table, initialized in ZUI.initialize
 
 /* Initialize */
 ZUI.initialize = function(settings) {
+	/* Initialize eventListeners */
+	ZUI.eventListeners = new ZUI.HashMap();
+
 	/* Set canvas and container handles */
 	if (settings.canvas) {
 		ZUI.canvas = settings.canvas;
 		ZUI.context = ZUI.canvas.getContext("2d");
+		ZUI.context.advArcTo = function() {
+			ZUI.context.save();
+			
+			ZUI.context.restore();
+		}
 		ZUI.container = ZUI.canvas.parentNode;
 	}
 	else {
@@ -62,9 +84,16 @@ ZUI.initialize = function(settings) {
 	}
 
 	/* Disable default context menu */
-	ZUI.container.oncontextmenu = function() {
+	ZUI.canvas.oncontextmenu = function(event) {
+		ZUI.contextMenu(event);
 		return false;
 	};
+
+	/* Define custom context menu */
+	ZUI.customContextMenu = new ZUI.ContextMenu();
+
+	/* Set cursor to default */
+	ZUI.container.style.cursor = "default";
 
 	/* Set width and height */
 	if (settings.width && settings.height) {
@@ -83,12 +112,10 @@ ZUI.initialize = function(settings) {
 	ZUI.backgroundAlpha = (settings.backgroundAlpha === undefined) ? 1 : settings.backgroundAlpha;
 
 	/* Set frame rate */
-	if (settings.frameRate) {
-		ZUI.frameRate = settings.frameRate;
-	}
-	else {
-		ZUI.frameRate = 60;
-	}
+	ZUI.frameRate = (settings.frameRate === undefined) ? 60 : settings.frameRate;
+
+	/* Set camera move rate */
+	ZUI.camera.moveRate = (settings.cameraMoveRate === undefined) ? 1 : settings.cameraMoveRate;
 
 	/* Add listeneres for input events */
 	ZUI.canvas.addEventListener("mousedown", ZUI.mouseDown, false);
@@ -98,7 +125,9 @@ ZUI.initialize = function(settings) {
 	ZUI.canvas.addEventListener("dblclick", ZUI.doubleClick, false);
 	ZUI.canvas.addEventListener("mousewheel", ZUI.mouseWheel, false);
 	ZUI.canvas.addEventListener("DOMMouseScroll", ZUI.mouseWheel, false);
-	ZUI.canvas.addEventListener("contextmenu", ZUI.contextMenu, false);
+	ZUI.canvas.addEventListener("gesturestart", ZUI.gestureStart, false);
+	ZUI.canvas.addEventListener("gesturechange", ZUI.gestureChange, false);
+	ZUI.canvas.addEventListener("gestureend", ZUI.gestureEnd, false);
 
 	/* Set first view */
 	ZUI.activeView = new ZUI.View();
@@ -151,30 +180,11 @@ ZUI.draw = function(timestamp) {
 		}
 
 		/* Draw */
-		if (ZUI.animation == null) {
-			if (ZUI.isChangeView) {
-				ZUI.activeView.inactive();
-				ZUI.activeView = ZUI.newView;
-				ZUI.isChangeView = false;
-				ZUI.oldView = null;
-				ZUI.newView = null;
-				ZUI.activeView.active();
-				ZUI.animate(ZUI.enterNewViewAnimation);
-			}
-			else {
-				ZUI.activeView.draw();
-			}
+		if (ZUI.activeView.animation) {
+			ZUI.activeView.animation.draw();
 		}
 		else {
-			if (!ZUI.animation.isOver()) {
-				ZUI.animation.next();
-			}
-			else {
-				if (ZUI.animation.end) {
-					ZUI.animation.end();
-				}
-				ZUI.animation = null;
-			}
+			ZUI.activeView.draw();
 		}
 
 		/* Check for mouse over/out events */
@@ -186,7 +196,9 @@ ZUI.draw = function(timestamp) {
 			if (viewObjects[n].isInBound(x, y)) {
 				viewObject = viewObjects[n];
 			}
-			else if (viewObjects[n].isHovered) {
+		}
+		for (n = 0; n < viewObjects.length; n++) {
+			if (viewObjects[n] != viewObject && viewObjects[n].isHovered) {
 				viewObjects[n].isHovered = false;
 				viewObjects[n].mouseOut();
 			}
@@ -200,27 +212,10 @@ ZUI.draw = function(timestamp) {
 	}
 };
 
-/* Change active view */
-ZUI.changeActiveView = function(view, exitAnimation, entryAnimation) {
-	ZUI.oldView = ZUI.activeView;
-	ZUI.newView = view;
-	if (!ZUI.isAnimateChangeView) {
-		exitAnimation = null;
-		entryAnimation = null;
-	}
-	ZUI.exitOldViewAnimation = exitAnimation;
-	ZUI.enterNewViewAnimation = entryAnimation;
-	ZUI.isChangeView = true;
-	ZUI.animate(ZUI.exitOldViewAnimation);
-};
-
-/* Animate the given Animation object */
-ZUI.animate = function(animation) {
-	ZUI.animation = animation;
-	if (ZUI.animation != null) {
-		ZUI.animation.reset();
-		ZUI.animation.begin();
-	}
+ZUI.changeActiveView = function(view) {
+	ZUI.activeView.inactive();
+	ZUI.activeView = view;
+	ZUI.activeView.active();
 };
 
 /* Update application at every frame, override with custom function */
@@ -310,13 +305,15 @@ ZUI.mouseMove = function(event) {
 		if (viewObjects[n].isInBound(x, y)) {
 			viewObject = viewObjects[n];
 		}
-		else if (viewObjects[n].isHovered) {
+	}
+
+	ZUI.activeView.mouseMove();
+	for (n = 0; n < viewObjects.length; n++) {
+		if (viewObjects[n] != viewObject && viewObjects[n].isHovered) {
 			viewObjects[n].isHovered = false;
 			viewObjects[n].mouseOut();
 		}
 	}
-
-	ZUI.activeView.mouseMove();
 	if (viewObject) {
 		viewObject.mouseMove();
 		if (!viewObject.isHovered) {
@@ -344,6 +341,9 @@ ZUI.click = function(event) {
 	}
 	
 	if (event.button == 0) {
+		if (ZUI.customContextMenu.active) {
+			ZUI.customContextMenu.close();
+		}
 		ZUI.activeView.leftClick();
 		if (viewObject) viewObject.leftClick();
 	}
@@ -430,8 +430,55 @@ ZUI.contextMenu = function(event) {
 	}
 };
 
-/* Function for passing input events to another element, override with custom function if needed */
-ZUI.passInputEvent = null;
+/* Gesture (multitouch) start event callback */
+ZUI.gestureStart = function(event) {
+	/* Initialize gesture status */
+	ZUI.touchStatus.lastPinch = 1;
+	ZUI.touchStatus.lastRotation = 0;
+};
+
+/* Gesture (multitouch) change event callback */
+ZUI.gestureChange = function(event) {
+	/* Update pinch */
+	if (!ZUI.touchStatus.isPinch && event.scale != 1) {
+		ZUI.touchStatus.isPinch = true;
+		ZUI.activeView.pinch(event.scale / ZUI.touchStatus.lastPinch);
+		ZUI.touchStatus.lastPinch = event.scale;
+	}
+	else if (ZUI.touchStatus.lastPinch != event.scale) {
+		ZUI.activeView.pinch(event.scale / ZUI.touchStatus.lastPinch);
+		ZUI.touchStatus.lastPinch = event.scale;
+	}
+
+	/* Update rotate */
+	if (!ZUI.touchStatus.isRotate && event.rotation != 0) {
+		ZUI.touchStatus.isRotate = true;
+		ZUI.activeView.rotate(event.rotation - ZUI.touchStatus.lastRotate);
+		ZUI.touchStatus.lastRotate = event.rotation;
+	}
+	else if (ZUI.touchStatus.lastRotate != event.rotation) {
+		ZUI.activeView.rotate(event.rotation - ZUI.touchStatus.lastRotate);
+		ZUI.touchStatus.lastRotate = event.rotation;
+	}
+};
+
+/* Gesture (multitouch) end event callback */
+ZUI.gestureEnd = function(event) {
+	/* Reset gesture status */
+	ZUI.touchStatus.isPinch = false;
+	ZUI.touchStatus.isRotate = false;
+};
+
+/* Disables pointer events for the ZUI canvas */
+/* This is useful when pointer events should be passed to a layer under the ZUI canvas and interactivity in the ZUI canvas is not required */
+ZUI.disablePointerEvents = function() {
+	ZUI.canvas.style.pointerEvents = "none";
+};
+
+/* Restores pointer events for the ZUI canvas */
+ZUI.restorePointerEvents = function() {
+	ZUI.canvas.style.pointerEvents = "auto";
+};
 
 /* Gets mouse screen coordinates */
 ZUI.getMousePosition = function(event) {
@@ -442,32 +489,94 @@ ZUI.getMousePosition = function(event) {
 	};
 };
 
-/* Checks whether the given string is a valid color */
-ZUI.isValidColor = function(str) {
-	if (!str || !str.match) {
-		return null;
+/* Fires a ZUI event */
+ZUI.fireEvent = function(event) {
+	/* Filter event listeners by type */
+	var eventListeners1 = ZUI.eventListeners.get(event.type);
+	if (!eventListeners1) {
+		return;
 	}
-	else {
-		return str.match(/^#[a-f0-9]{6}$/i) !== null;
+
+	/* Filter event listeners by target */
+	var eventListeners2 = eventListeners1.get(event.target);
+	if (!eventListeners2) {
+		return;
+	}
+
+	/* Execute callback functions */
+	for (var n = 0; n < eventListeners2.length; n++) {
+		eventListeners2[n].callback(event, event.data, eventListeners2[n].data);
+	}
+
+	/* Execute callback functions with no particular target */
+	var eventListeners3 = eventListeners1.get("_all");
+	if (!eventListeners3) {
+		return;
+	}
+	for (n = 0; n < eventListeners3.length; n++) {
+		eventListeners3[n].callback(event, event.data, eventListeners3[n].data);
 	}
 };
 
-/* Checks whether the given string ends with the given suffix */
-ZUI.endsWith = function(str, suffix) {
-	return str.indexOf(suffix, str.length - suffix.length) !== -1;
+/* Adds a ZUI event listener */
+ZUI.addEventListener = function(eventListener) {
+	/* Filter event listeners by type */
+	var eventListeners1 = ZUI.eventListeners.get(eventListener.type);
+	if (!eventListeners1) {
+		eventListeners1 = new ZUI.HashMap();
+		ZUI.eventListeners.put(eventListener.type, eventListeners1);
+	}
+
+	/* Filter event listeners by target */
+	var target = eventListener.target;
+	if (target === undefined || target === null) {
+		target = "_all";
+	}
+	var eventListeners2 = eventListeners1.get(target);
+	if (!eventListeners2) {
+		eventListeners2 = [];
+		eventListeners1.put(target, eventListeners2);
+	}
+
+	/* Add event listener */
+	eventListeners2.push(eventListener);
 };
 
-/* Converts number to string with comma separators */
-ZUI.getNumberWithComma = function(number) {
-	/* By mikez302, http://stackoverflow.com/questions/2901102/how-to-print-a-number-with-commas-as-thousands-separators-in-javascript */
-	var parts = (number + "").split(".");
-	parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-	return parts.join(".");
+/* Removes a ZUI event listener */
+ZUI.removeEventListener = function(eventListener) {
+	/* Filter event listeners by type */
+	var eventListeners1 = ZUI.eventListeners.get(eventListener.type);
+	if (!eventListeners1) {
+		return;
+	}
+
+	/* Filter event listeners by target */
+	var target = eventListener.target;
+	if (target === undefined || target === null) {
+		target = "_all";
+	}
+	var eventListeners2 = eventListeners1.get(target);
+	if (!eventListeners2) {
+		return;
+	}
+
+	/* Remove event listener */
+	var index = eventListeners2.indexOf(eventListener);
+	if (index < 0) {
+		return;
+	}
+	eventListeners2.splice(index, 1);
+
+	/* Remove target level eventListeners if empty */
+	if (eventListeners2.length == 0) {
+		eventListeners1.delete(target);
+	}
+
+	/* Remove type level eventListeners if empty */
+	if (eventListeners1.length == 0) {
+		ZUI.eventListeners.delete(eventListener.type);
+	}
 };
 
-/* Converts canvas to image and display in new window */
-ZUI.toImageInWindow = function() {
-	window.open(ZUI.canvas.toDataURL());
-};
-
-
+/* Function for passing input events to another element, override with custom function if needed */
+ZUI.passInputEvent = null;
