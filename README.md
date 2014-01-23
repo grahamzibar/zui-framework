@@ -101,8 +101,8 @@ The ```ZUI.ViewObject``` class constructor can be called to create a ViewObject 
 ```
 var myViewObject = new ZUI.ViewObject({
 	shape: "circle",
-	positionScale: "screen",
-	sizeScale: "screen",
+	positionScale: "world",
+	sizeScale: "world",
 	x: 200,
 	y: 200,
 	radius: 100,
