@@ -29,6 +29,13 @@ ZUI.initialize({
 
 Creating a View
 -------------
+The ZUI framework is driven by Views. A ZUI View is an object with various callback methods defined so that the ZUI framework can tell the View about what the View should respond to. How the View responds depends on how the callback method id defined.
+
+The main callback methods of a View are:
+```active()```: This method is called when the View becomes active. There can only be one active View at any given time.<br>
+```inactive()```: This method is called when the View becomes inactive.<br>
+```draw()```:  This method is called when the ZUI framework is ready to draw the next frame. Only the ```draw()``` method of the currently active View will be called.<br>
+```remove()```: This method should be manually called when the View is no longer needed. It is intended to handle the View's cleanup procedures. Note the ZUI framework will never call this method automatically.<br>
 
 
 Adding ViewObjects to a View
