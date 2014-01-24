@@ -329,9 +329,13 @@ ZUI.ViewObject = function(attributes) {
 				this.redraw = true;
 			}
 		});
+		this.private.vertices.push = (function(item) {
+			Array.prototype.push(this.private.vertices, item);
+			this.redraw = true;
+		}).bind(this);
 	}
 	else if (this.shape == "path") {
-		this.private.vertices = (attributes.vertices === undefined) ? "" : attributes.vertices;
+		this.private.vertices = (attributes.vertices === undefined) ? [] : attributes.vertices;
 		Object.defineProperty(this, "vertices", {
 			get: function() {
 				return this.private.vertices;
@@ -341,6 +345,10 @@ ZUI.ViewObject = function(attributes) {
 				this.redraw = true;
 			}
 		});
+		this.private.vertices.push = (function(item) {
+			Array.prototype.push(this.private.vertices, item);
+			this.redraw = true;
+		}).bind(this);
 	}
 	else if (this.shape == "text") {
 		this.private.size = (attributes.size === undefined) ? 12 : attributes.size;
