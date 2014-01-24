@@ -99,12 +99,12 @@ ZUI.initialize = function(settings) {
 	if (settings.width && settings.height) {
 		ZUI.width = settings.width;
 		ZUI.height = settings.height;
-		$(ZUI.canvas).width(ZUI.width);
-		$(ZUI.canvas).height(ZUI.height);
+		ZUI.canvas.width = ZUI.width;
+		ZUI.canvas.height = ZUI.height;
 	}
 	else {
-		ZUI.width = $(ZUI.canvas).width();
-		ZUI.height = $(ZUI.canvas).height();
+		ZUI.width = ZUI.canvas.width;
+		ZUI.height = ZUI.canvas.height;
 	}
 
 	/* Set background */
