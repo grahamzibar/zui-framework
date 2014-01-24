@@ -22,6 +22,7 @@
 </head>
 <body>
 <h1>Welcome! This is a sample Canvas application built with <a href="https://github.com/yuzhenmi/zui-framework">zui-framework</a></h1>
+<p id="instructions"></p>
 <canvas id="zui-canvas">
   Your browser does not support HTML5 Canvas.
 </canvas>
@@ -53,7 +54,19 @@ function DrawingBoardView() {
 }
 ZUI.Util.inheritClass(ZUI.View, DrawingBoardView);  // Inherit parent prototype
 
-/* Override draw callback function */
+/* Override active callback method */
+DrawingBoardView.prototype.active = function() {
+  /* Update instructions */
+  document.getElementById("instructions").innerHTML = "Hold down your left mouse key and drag your mouse to draw lines on the board. Right click to clear the board.";
+}
+
+/* Override inactive callback method */
+DrawingBoardView.prototype.inactive = function() {
+  /* Clear instructions */
+  document.getElementById("instructions").innerHTML = "";
+}
+
+/* Override draw callback method */
 DrawingBoardView.prototype.draw = function() {
   /* Draw lines */
   for (var n = 0; n < this.lines.length; n++) {
@@ -64,7 +77,7 @@ DrawingBoardView.prototype.draw = function() {
   this.border.draw();
 };
 
-/* Override leftMouseDown callback function */
+/* Override leftMouseDown callback method */
 DrawingBoardView.prototype.leftMouseDown = function() {
   /* Create new line */
   this.lines.push(new ZUI.ViewObject({
@@ -83,7 +96,7 @@ DrawingBoardView.prototype.leftMouseDown = function() {
   }));
 };
 
-/* Override mouseMove callback function */
+/* Override mouseMove callback method */
 DrawingBoardView.prototype.mouseMove = function() {
   /* Check if left mouse button is pressed down */
   if (ZUI.mouseStatus.leftDown) {
@@ -98,12 +111,12 @@ DrawingBoardView.prototype.mouseMove = function() {
   }
 };
 
-/* Override rightClick callback function */
+/* Override rightClick callback method */
 DrawingBoardView.prototype.rightMouseUp = function() {
   this.eraseBoard();
 };
 
-/* Override remove callback function */
+/* Override remove callback method */
 DrawingBoardView.prototype.remove = function() {
   /* Erase board */
   this.eraseBoard();
