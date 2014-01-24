@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<script type="text/javascript" src="src/ZUI.js"></script>
+<script type="text/javascript" src="src/ZUI.HashMap.js"></script>
+<script type="text/javascript" src="src/ZUI.Util.js"></script>
+<script type="text/javascript" src="src/ZUI.Util.KeySpline.js"></script>
+<script type="text/javascript" src="src/ZUI.Math.js"></script>
+<script type="text/javascript" src="src/ZUI.Statistics.js"></script>
+<script type="text/javascript" src="src/ZUI.Geometry.js"></script>
+<script type="text/javascript" src="src/ZUI.Parser.js"></script>
+<script type="text/javascript" src="src/ZUI.camera.js"></script>
+<script type="text/javascript" src="src/ZUI.View.js"></script>
+<script type="text/javascript" src="src/ZUI.ViewObject.js"></script>
+<script type="text/javascript" src="src/ZUI.Event.js"></script>
+<script type="text/javascript" src="src/ZUI.EventListener.js"></script>
+<script type="text/javascript" src="src/ZUI.Animation.js"></script>
+<script type="text/javascript" src="src/ZUI.ContextMenu.js"></script>
+<script type="text/javascript" src="src/ZUI.ContextMenuOption.js"></script>
+
+</head>
+<body>
+<h1>Welcome! This is a sample Canvas application built with <a href="https://github.com/yuzhenmi/zui-framework">zui-framework</a></h1>
+<canvas id="zui-canvas">
+  Your browser does not support HTML5 Canvas.
+</canvas>
+
+<script type="text/javascript>
+
+/* Define DrawingBoardView constructor */
+function DrawingBoardView() {
+  /* Call parent constructor */
+  ZUI.View.call(this);
+  
+  /* Array to keep track of all the lines drawn */
+  this.lines = [];
+}
+ZUI.Util.inheritClass(ZUI.View, DrawingBoardView);  // Inherit parent prototype
+
+/* Override draw callback function */
+DrawingBoardView.prototype.draw = function() {
+  for (var n = 0; n < this.lines.length; n++) {
+    this.lines[n].draw();
+  }
+};
+
+/* Override leftMouseDown callback function */
+DrawingBoardView.prototype.leftMouseDown = function() {
+  this.lines.push(new ZUI.ViewObject({
+    shape: "path",
+    positionScale: "screen",
+    sizeScale: "screen",
+    x: 0,
+    y: 0,
+    strokeColor: "#000000",
+    strokeWidth: 2,
+    centerAt: "left top",
+    vertices: [{
+      x: ZUI.mouseStatus.x,
+      y: ZUI.mouseStatus.y
+    }]
+  }));
+};
+
+/* Override mouseMove callback function */
+DrawingBoardView.prototype.mouseMove = function() {
+  if (ZUI.mouseStatus.leftDown) {
+    this.lines[this.lines.length - 1].vertices.push({
+      x: ZUI.mouseStatus.x,
+      y: ZUI.mouseStatus.y
+    });
+    this.lines[this.lines.length - 1].redraw = true;
+  }
+};
+
+</script>
+
+<script type="text/javascript>
+
+/* Initialize ZUI */
+ZUI.initialize({
+  canvas: document.getElementById("zui-canvas"),
+  width: 800,
+  height: 600,
+  frameRate: 30
+});
+
+/* Instantiate Views */
+var drawingBoardView = new DrawingBoardView();
+
+/* Change active View */
+ZUI.changeActiveView(drawingBoardView);
+
+</script>
+
+</body>
+</html>
