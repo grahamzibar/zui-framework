@@ -26,12 +26,27 @@
   Your browser does not support HTML5 Canvas.
 </canvas>
 
-<script type="text/javascript>
+<script type="text/javascript">
 
 /* Define DrawingBoardView constructor */
 function DrawingBoardView() {
   /* Call parent constructor */
   ZUI.View.call(this);
+
+  /* Border */
+  this.border = new ZUI.ViewObject({
+    shape: "rect",
+    positionScale: "screen",
+    sizeScale: "screen",
+    x: 0,
+    y: 0,
+    width: ZUI.width,
+    height: ZUI.height,
+    strokeColor: "#CC9933",
+    strokeWidth: 4,
+    fill: false,
+    centerAt: "left top"
+  });
   
   /* Array to keep track of all the lines drawn */
   this.lines = [];
@@ -40,13 +55,18 @@ ZUI.Util.inheritClass(ZUI.View, DrawingBoardView);  // Inherit parent prototype
 
 /* Override draw callback function */
 DrawingBoardView.prototype.draw = function() {
+  /* Draw lines */
   for (var n = 0; n < this.lines.length; n++) {
     this.lines[n].draw();
   }
+
+  /* Draw border */
+  this.border.draw();
 };
 
 /* Override leftMouseDown callback function */
 DrawingBoardView.prototype.leftMouseDown = function() {
+  /* Create new line */
   this.lines.push(new ZUI.ViewObject({
     shape: "path",
     positionScale: "screen",
@@ -65,18 +85,45 @@ DrawingBoardView.prototype.leftMouseDown = function() {
 
 /* Override mouseMove callback function */
 DrawingBoardView.prototype.mouseMove = function() {
+  /* Check if left mouse button is pressed down */
   if (ZUI.mouseStatus.leftDown) {
-    this.lines[this.lines.length - 1].vertices.push({
+    /* Add new vertex to the line that is currently being drawn */
+    this.lines[this.lines.length - 1].private.vertices.push({
       x: ZUI.mouseStatus.x,
       y: ZUI.mouseStatus.y
     });
+
+    /* Set redraw flag to true */
     this.lines[this.lines.length - 1].redraw = true;
   }
 };
 
+/* Override rightClick callback function */
+DrawingBoardView.prototype.rightMouseUp = function() {
+  this.eraseBoard();
+};
+
+/* Override remove callback function */
+DrawingBoardView.prototype.remove = function() {
+  /* Erase board */
+  this.eraseBoard();
+
+  /* Remove border */
+  this.border.remove();
+};
+
+/* Erase board */
+DrawingBoardView.prototype.eraseBoard = function() {
+  /* Remove lines */
+  for (var n = 0; n < this.lines.length; n++) {
+    this.lines[n].remove();
+  }
+  this.lines = [];
+};
+
 </script>
 
-<script type="text/javascript>
+<script type="text/javascript">
 
 /* Initialize ZUI */
 ZUI.initialize({
