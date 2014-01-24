@@ -331,7 +331,7 @@ ZUI.ViewObject = function(attributes) {
 		});
 	}
 	else if (this.shape == "path") {
-		this.private.vertices = (attributes.vertices === undefined) ? "" : attributes.vertices;
+		this.private.vertices = (attributes.vertices === undefined) ? [] : attributes.vertices;
 		Object.defineProperty(this, "vertices", {
 			get: function() {
 				return this.private.vertices;
