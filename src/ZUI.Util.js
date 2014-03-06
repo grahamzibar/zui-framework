@@ -101,3 +101,17 @@ ZUI.Util.inheritClass = function(parent, child) {
 	protoCreator.prototype = parent.prototype;
 	child.prototype = new protoCreator();
 };
+
+/* Interprets a string representing a class path and returns the actual class */
+ZUI.Util.readClassPath = function(classPath) {
+	var parts = classPath.split(".");
+	var scope = window;
+	for (var n = 0; n < parts.length; n++) {
+		scope = scope[parts[n]];
+		if (scope === undefined || scope === null) {
+			console.log("Warning: The class path " + classPath + " cannot be found.");
+			return undefined;
+		}
+	}
+	return scope;
+};

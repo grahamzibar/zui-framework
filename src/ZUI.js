@@ -161,7 +161,7 @@ ZUI.draw = function(timestamp) {
 		if (ZUI.camera.autoUpdate) {
 			ZUI.camera.update();
 		}
-	
+
 		/* Clear canvas */
 		ZUI.context.clearRect(0, 0, ZUI.width, ZUI.height);
 		ZUI.context.save();
@@ -499,22 +499,19 @@ ZUI.fireEvent = function(event) {
 
 	/* Filter event listeners by target */
 	var eventListeners2 = eventListeners1.get(event.target);
-	if (!eventListeners2) {
-		return;
-	}
-
-	/* Execute callback functions */
-	for (var n = 0; n < eventListeners2.length; n++) {
-		eventListeners2[n].callback(event, event.data, eventListeners2[n].data);
+	if (eventListeners2) {
+		/* Execute callback functions */
+		for (var n = 0; n < eventListeners2.length; n++) {
+			eventListeners2[n].callback(event, event.data, eventListeners2[n].data);
+		}
 	}
 
 	/* Execute callback functions with no particular target */
 	var eventListeners3 = eventListeners1.get("_all");
-	if (!eventListeners3) {
-		return;
-	}
-	for (n = 0; n < eventListeners3.length; n++) {
-		eventListeners3[n].callback(event, event.data, eventListeners3[n].data);
+	if (eventListeners3) {
+		for (n = 0; n < eventListeners3.length; n++) {
+			eventListeners3[n].callback(event, event.data, eventListeners3[n].data);
+		}
 	}
 };
 
@@ -575,6 +572,21 @@ ZUI.removeEventListener = function(eventListener) {
 	/* Remove type level eventListeners if empty */
 	if (eventListeners1.length == 0) {
 		ZUI.eventListeners.delete(eventListener.type);
+	}
+};
+
+/* Removes all ZUI event listeners for the specified target */
+ZUI.removeEventListenersForTarget = function(target) {
+	var keys = ZUI.eventListeners.getKeys();
+	for (var n = 0; n < keys.length; n++) {
+		var key = keys[n];
+		var eventListeners = ZUI.eventListeners.get(key);
+		if (eventListeners.get(target)) {
+			eventListeners.delete(target);
+		}
+		if (!eventListeners.getSize()) {
+			ZUI.eventListeners.delete(key);
+		}
 	}
 };
 
