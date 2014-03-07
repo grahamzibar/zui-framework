@@ -1,8 +1,8 @@
 (function() {
 
-    ZUI.Primitive.Rect = function(params) {
+    ZUI.Primitive.Rect = function() {
         // call parent constructor
-        ZUI.Primitive.Base.call(this, params);
+        ZUI.Primitive.Base.apply(this, arguments);
     };
 
 })();
