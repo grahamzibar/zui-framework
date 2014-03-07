@@ -119,8 +119,8 @@
         this._private.context.restore();
     };
 
-    // pointer hit test
-    ZUI.RenderedObject.Rectangle.prototype.pointerHitTest = function(x, y) {
+    // point hit test
+    ZUI.RenderedObject.Rectangle.prototype.pointHitTest = function(x, y) {
         this._private.context.isPointInPath(x, y);
     };
 

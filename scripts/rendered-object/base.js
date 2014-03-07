@@ -94,7 +94,7 @@
         this.renderedStrokeThickness = ZUI.Helper.interpretScale(this.strokeThickness, this.strokeThicknessScale);
     };
 
-    // pointer hit test (abstract)
-    ZUI.RenderedObject.Base.prototype.pointerHitTest = function (x, y) {};
+    // point hit test (abstract)
+    ZUI.RenderedObject.Base.prototype.pointHitTest = function (x, y) {};
 
 })();

@@ -2,28 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b08611af-97be-40e3-a6a2-552f0540d090" name="Default" comment="">
-      <change type="MOVED" beforePath="C:\codes\zui-framework\scripts\ZUI.Animation.js" afterPath="$PROJECT_DIR$/scripts/old-code/ZUI.Animation.js" />
-      <change type="MOVED" beforePath="C:\codes\zui-framework\scripts\ZUI.ContextMenu.js" afterPath="$PROJECT_DIR$/scripts/old-code/ZUI.ContextMenu.js" />
-      <change type="MOVED" beforePath="C:\codes\zui-framework\scripts\ZUI.ContextMenuOption.js" afterPath="$PROJECT_DIR$/scripts/old-code/ZUI.ContextMenuOption.js" />
-      <change type="MOVED" beforePath="C:\codes\zui-framework\scripts\ZUI.Event.js" afterPath="$PROJECT_DIR$/scripts/old-code/ZUI.Event.js" />
-      <change type="MOVED" beforePath="C:\codes\zui-framework\scripts\ZUI.EventListener.js" afterPath="$PROJECT_DIR$/scripts/old-code/ZUI.EventListener.js" />
-      <change type="MOVED" beforePath="C:\codes\zui-framework\scripts\ZUI.Geometry.js" afterPath="$PROJECT_DIR$/scripts/old-code/ZUI.Geometry.js" />
-      <change type="MOVED" beforePath="C:\codes\zui-framework\scripts\ZUI.HashMap.js" afterPath="$PROJECT_DIR$/scripts/old-code/ZUI.HashMap.js" />
-      <change type="MOVED" beforePath="C:\codes\zui-framework\scripts\ZUI.Math.js" afterPath="$PROJECT_DIR$/scripts/old-code/ZUI.Math.js" />
-      <change type="MOVED" beforePath="C:\codes\zui-framework\scripts\ZUI.Parser.js" afterPath="$PROJECT_DIR$/scripts/old-code/ZUI.Parser.js" />
-      <change type="MOVED" beforePath="C:\codes\zui-framework\scripts\ZUI.Statistics.js" afterPath="$PROJECT_DIR$/scripts/old-code/ZUI.Statistics.js" />
-      <change type="MOVED" beforePath="C:\codes\zui-framework\scripts\ZUI.Util.KeySpline.js" afterPath="$PROJECT_DIR$/scripts/old-code/ZUI.Util.KeySpline.js" />
-      <change type="MOVED" beforePath="C:\codes\zui-framework\scripts\ZUI.Util.js" afterPath="$PROJECT_DIR$/scripts/old-code/ZUI.Util.js" />
-      <change type="MOVED" beforePath="C:\codes\zui-framework\scripts\ZUI.View.js" afterPath="$PROJECT_DIR$/scripts/old-code/ZUI.View.js" />
-      <change type="MOVED" beforePath="C:\codes\zui-framework\scripts\ZUI.ViewObject.js" afterPath="$PROJECT_DIR$/scripts/old-code/ZUI.ViewObject.js" />
-      <change type="MOVED" beforePath="C:\codes\zui-framework\scripts\ZUI.camera.js" afterPath="$PROJECT_DIR$/scripts/old-code/ZUI.camera.js" />
-      <change type="MOVED" beforePath="C:\codes\zui-framework\scripts\ZUI.js" afterPath="$PROJECT_DIR$/scripts/old-code/ZUI.js" />
-      <change type="MOVED" beforePath="C:\codes\zui-framework\scripts\rendered-object\rect.js" afterPath="$PROJECT_DIR$/scripts/rendered-object/rectangle.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/scripts/rendered-object/base.js" afterPath="$PROJECT_DIR$/scripts/rendered-object/base.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/scripts/def/def.js" afterPath="$PROJECT_DIR$/scripts/def/def.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/scripts/helper/helper.js" afterPath="$PROJECT_DIR$/scripts/helper/helper.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/index.html" afterPath="$PROJECT_DIR$/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/scripts/rendered-object/rectangle.js" afterPath="$PROJECT_DIR$/scripts/rendered-object/rectangle.js" />
     </list>
     <ignored path="zui-framework.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -72,10 +52,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="base.js" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="base.js" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/scripts/rendered-object/base.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="97" column="72" selection-start="3180" selection-end="3180" vertical-scroll-proportion="0.0" vertical-offset="1295" max-vertical-offset="1785">
+            <state line="96" column="12" selection-start="3085" selection-end="3085" vertical-scroll-proportion="0.6877551" vertical-offset="1295" max-vertical-offset="1785">
               <folding />
             </state>
           </provider>
@@ -90,10 +70,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="rectangle.js" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="rectangle.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/scripts/rendered-object/rectangle.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="127" column="0" selection-start="5885" selection-end="5885" vertical-scroll-proportion="0.8218029" vertical-offset="1767" max-vertical-offset="2261">
+            <state line="122" column="48" selection-start="5789" selection-end="5789" vertical-scroll-proportion="0.0" vertical-offset="1784" max-vertical-offset="2261">
               <folding />
             </state>
           </provider>
@@ -174,8 +154,8 @@
         <option value="$PROJECT_DIR$/scripts/base.js" />
         <option value="$PROJECT_DIR$/scripts/def/def.js" />
         <option value="$PROJECT_DIR$/scripts/helper/helper.js" />
-        <option value="$PROJECT_DIR$/scripts/rendered-object/base.js" />
         <option value="$PROJECT_DIR$/scripts/rendered-object/rectangle.js" />
+        <option value="$PROJECT_DIR$/scripts/rendered-object/base.js" />
       </list>
     </option>
   </component>
@@ -543,13 +523,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/base.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="50" column="9" selection-start="1396" selection-end="1396" vertical-scroll-proportion="0.0" vertical-offset="513" max-vertical-offset="1071">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/scripts/def/def.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="6" column="28" selection-start="153" selection-end="153" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="289">
@@ -560,13 +533,6 @@
     <entry file="file://$PROJECT_DIR$/scripts/helper/helper.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="63" column="19" selection-start="1879" selection-end="1879" vertical-scroll-proportion="0.0" vertical-offset="989" max-vertical-offset="1853">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/rendered-object/base.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="97" column="72" selection-start="3180" selection-end="3180" vertical-scroll-proportion="0.0" vertical-offset="1295" max-vertical-offset="1785">
           <folding />
         </state>
       </provider>
@@ -582,7 +548,21 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/scripts/rendered-object/rectangle.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="127" column="0" selection-start="5885" selection-end="5885" vertical-scroll-proportion="0.8218029" vertical-offset="1767" max-vertical-offset="2261">
+        <state line="122" column="48" selection-start="5789" selection-end="5789" vertical-scroll-proportion="0.0" vertical-offset="1784" max-vertical-offset="2261">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/base.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="50" column="9" selection-start="1396" selection-end="1396" vertical-scroll-proportion="0.0" vertical-offset="513" max-vertical-offset="1071">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/rendered-object/base.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="96" column="12" selection-start="3085" selection-end="3085" vertical-scroll-proportion="0.6877551" vertical-offset="1295" max-vertical-offset="1785">
           <folding />
         </state>
       </provider>
