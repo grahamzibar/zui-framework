@@ -2,11 +2,15 @@
 
     // constructor
     ZUI.RenderedObject.Base = function (properties) {
+        // call base constructor
+        ZUI.Base.call(this);
+
         // private properties
         this._private.isUpdated = true;
         this._private.isReady = false;
         this._private.canvas = document.createElement('canvas');
         this._private.context = this._private.canvas.getContext('2d');
+        this._private.views = [];
 
         // set canvas size
         this._private.canvas.width = ZUI.width;
@@ -14,7 +18,7 @@
 
         // transfer properties to this object
         for (var propertyName in properties) {
-            that[propertyName] = properties[propertyName];
+            this[propertyName] = properties[propertyName];
         }
 
         // save scope for access by child scopes
@@ -73,14 +77,15 @@
 
     // attach to view
     ZUI.RenderedObject.Base.prototype.attachToView = function(view) {
-        this._private.view = view;
+        this._private.views.push(view);
         view.renderedObjects.push(this);
         return this;
     };
 
     // detach from view
-    ZUI.RenderedObject.Base.prototype.detachFromView = function () {
-        ZUI.Helper.removeFromArray(this._private.view.renderedObjects, this);
+    ZUI.RenderedObject.Base.prototype.detachFromView = function (view) {
+        ZUI.Helper.removeFromArray(this._private.views, view);
+        ZUI.Helper.removeFromArray(view.renderedObjects, this);
         return this;
     };
 
