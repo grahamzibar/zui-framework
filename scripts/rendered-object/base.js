@@ -24,6 +24,8 @@
         //   data
         //   position {x, y}
         //   positionScale
+        //   positionOffset {x, y}
+        //   positionOffsetScale
         //   stroke
         //   strokeColor
         //   strokeThickness
@@ -41,6 +43,11 @@
                     y: 0
                 },
                 positionScale: ZUI.Def.WorldScale,
+                positionOffset: {
+                    x: 0,
+                    y: 0
+                },
+                positionOffsetScale: ZUI.Def.ScreenScale,
                 stroke: true,
                 strokeColor: "#000000",
                 strokeThickness: 1,
@@ -64,22 +71,31 @@
     // inherit base
     ZUI.Helper.inheritClass(ZUI.Base, ZUI.RenderedObject.Base);
 
-    // add to view
-    ZUI.RenderedObject.Base.prototype.addToView = function(view) {
+    // attach to view
+    ZUI.RenderedObject.Base.prototype.attachToView = function(view) {
         this._private.view = view;
         view.renderedObjects.push(this);
         return this;
     };
 
-    // remove from view
-    ZUI.RenderedObject.Base.prototype.removeFromView = function () {
+    // detach from view
+    ZUI.RenderedObject.Base.prototype.detachFromView = function () {
         ZUI.Helper.removeFromArray(this._private.view.renderedObjects, this);
         return this;
     };
 
     // draw
     ZUI.RenderedObject.Base.prototype.draw = function () {
+        if (this._private.isUpdated) {
+            this.render();
+        }
+
         ZUI.context.drawImage(this._private.canvas, 0, 0);
+    };
+
+    // point hit test
+    ZUI.RenderedObject.Base.prototype.pointHitTest = function (x, y) {
+        this._private.context.isPointInPath(x, y);
     };
 
     // render (abstract)
@@ -90,11 +106,10 @@
         // get rendered position
         this.renderedPosition = ZUI.Helper.interpretScale(this.position, this.positionScale);
 
+        this.renderedPositionOffset = ZUI.Helper.interpretScale(this.positionOffset, this.positionOffsetScale);
+
         // get rendered stroke thickness
         this.renderedStrokeThickness = ZUI.Helper.interpretScale(this.strokeThickness, this.strokeThicknessScale);
     };
-
-    // point hit test (abstract)
-    ZUI.RenderedObject.Base.prototype.pointHitTest = function (x, y) {};
 
 })();

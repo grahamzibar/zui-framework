@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="b08611af-97be-40e3-a6a2-552f0540d090" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/scripts/rendered-object/base.js" afterPath="$PROJECT_DIR$/scripts/rendered-object/base.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/scripts/helper/helper.js" afterPath="$PROJECT_DIR$/scripts/helper/helper.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/scripts/rendered-object/rectangle.js" afterPath="$PROJECT_DIR$/scripts/rendered-object/rectangle.js" />
     </list>
     <ignored path="zui-framework.iws" />
@@ -43,19 +44,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="methods.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/scripts/methods.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="4" column="5" selection-start="22" selection-end="22" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="170">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="base.js" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="base.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/scripts/rendered-object/base.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="96" column="12" selection-start="3085" selection-end="3085" vertical-scroll-proportion="0.6877551" vertical-offset="1295" max-vertical-offset="1785">
+            <state line="97" column="50" selection-start="3040" selection-end="3040" vertical-scroll-proportion="0.0" vertical-offset="1465" max-vertical-offset="2040">
               <folding />
             </state>
           </provider>
@@ -73,7 +65,16 @@
       <file leaf-file-name="rectangle.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/scripts/rendered-object/rectangle.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="122" column="48" selection-start="5789" selection-end="5789" vertical-scroll-proportion="0.0" vertical-offset="1784" max-vertical-offset="2261">
+            <state line="122" column="6" selection-start="5814" selection-end="5814" vertical-scroll-proportion="0.0" vertical-offset="1648" max-vertical-offset="2227">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="circle.js" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/scripts/rendered-object/circle.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="82" column="19" selection-start="3124" selection-end="3124" vertical-scroll-proportion="0.44489795" vertical-offset="1176" max-vertical-offset="1734">
               <folding />
             </state>
           </provider>
@@ -82,7 +83,7 @@
       <file leaf-file-name="ZUI.ViewObject.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/scripts/old-code/ZUI.ViewObject.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="850" column="98" selection-start="25939" selection-end="26003" vertical-scroll-proportion="369.92" vertical-offset="23698" max-vertical-offset="25534">
+            <state line="946" column="28" selection-start="28917" selection-end="28917" vertical-scroll-proportion="-10.88" vertical-offset="15810" max-vertical-offset="25534">
               <folding>
                 <element signature="n#!!doc" expanded="true" />
               </folding>
@@ -93,7 +94,7 @@
       <file leaf-file-name="helper.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/scripts/helper/helper.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="63" column="19" selection-start="1879" selection-end="1879" vertical-scroll-proportion="0.0" vertical-offset="989" max-vertical-offset="1853">
+            <state line="65" column="44" selection-start="1998" selection-end="1998" vertical-scroll-proportion="0.0" vertical-offset="989" max-vertical-offset="1853">
               <folding />
             </state>
           </provider>
@@ -154,8 +155,9 @@
         <option value="$PROJECT_DIR$/scripts/base.js" />
         <option value="$PROJECT_DIR$/scripts/def/def.js" />
         <option value="$PROJECT_DIR$/scripts/helper/helper.js" />
-        <option value="$PROJECT_DIR$/scripts/rendered-object/rectangle.js" />
         <option value="$PROJECT_DIR$/scripts/rendered-object/base.js" />
+        <option value="$PROJECT_DIR$/scripts/rendered-object/rectangle.js" />
+        <option value="$PROJECT_DIR$/scripts/rendered-object/circle.js" />
       </list>
     </option>
   </component>
@@ -530,29 +532,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/helper/helper.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="63" column="19" selection-start="1879" selection-end="1879" vertical-scroll-proportion="0.0" vertical-offset="989" max-vertical-offset="1853">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/old-code/ZUI.ViewObject.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="850" column="98" selection-start="25939" selection-end="26003" vertical-scroll-proportion="369.92" vertical-offset="23698" max-vertical-offset="25534">
-          <folding>
-            <element signature="n#!!doc" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/rendered-object/rectangle.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="122" column="48" selection-start="5789" selection-end="5789" vertical-scroll-proportion="0.0" vertical-offset="1784" max-vertical-offset="2261">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/scripts/base.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="50" column="9" selection-start="1396" selection-end="1396" vertical-scroll-proportion="0.0" vertical-offset="513" max-vertical-offset="1071">
@@ -560,9 +539,39 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/helper/helper.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="65" column="44" selection-start="1998" selection-end="1998" vertical-scroll-proportion="0.0" vertical-offset="989" max-vertical-offset="1853">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/old-code/ZUI.ViewObject.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="946" column="28" selection-start="28917" selection-end="28917" vertical-scroll-proportion="-10.88" vertical-offset="15810" max-vertical-offset="25534">
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/scripts/rendered-object/base.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="96" column="12" selection-start="3085" selection-end="3085" vertical-scroll-proportion="0.6877551" vertical-offset="1295" max-vertical-offset="1785">
+        <state line="97" column="50" selection-start="3040" selection-end="3040" vertical-scroll-proportion="0.0" vertical-offset="1465" max-vertical-offset="2040">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/rendered-object/rectangle.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="122" column="6" selection-start="5814" selection-end="5814" vertical-scroll-proportion="0.0" vertical-offset="1750" max-vertical-offset="2227">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/rendered-object/circle.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="82" column="19" selection-start="3124" selection-end="3124" vertical-scroll-proportion="0.44489795" vertical-offset="1176" max-vertical-offset="1734">
           <folding />
         </state>
       </provider>

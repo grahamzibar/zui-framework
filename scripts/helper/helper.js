@@ -60,10 +60,10 @@
         }
     };
 
-    ZUI.Helper.interpretCenterAt = function(position, width, height, centerAt) {
+    ZUI.Helper.interpretCenterAt = function(position, positionOffset, width, height, centerAt) {
         var adustedPosition = {
-            x: position.x,
-            y: position.y
+            x: position.x + positionOffset.x,
+            y: position.y + positionOffset.y
         }
 
         if (this.centerAt.horizontal === ZUI.Def.Left) {

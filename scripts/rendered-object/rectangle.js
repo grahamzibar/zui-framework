@@ -2,11 +2,11 @@
 
     // constructor
     ZUI.RenderedObject.Rectangle = function(properties) {
+        // call base constructor
+        ZUI.RenderedObject.Base.call(this, properties);
+
         // save scope for access by child scopes
         var that = this;
-
-        // call base constructor
-        ZUI.RenderedObject.Base.call(that, properties);
 
         // assign default to undefined properties
         //   width
@@ -90,8 +90,8 @@
         if (this.renderedRbRadius > this.renderedWidth / 2) this.renderedRbRadius = this.renderedWidth / 2;
         if (this.renderedRbRadius > this.renderedHeight / 2) this.renderedRbRadius = this.renderedHeight / 2;
 
-        // get center at position
-        var adjustedPosition = ZUI.Helper.interpretCenterAt(this.renderedPosition, this.renderedWidth, this.renderedHeight, this.centerAt);
+        // get adjusted position
+        var adjustedPosition = ZUI.Helper.interpretCenterAt(this.renderedPosition, this.renderedPositionOffset, this.renderedWidth, this.renderedHeight, this.centerAt);
 
         // set up context
         this._private.context.save();
@@ -117,11 +117,9 @@
 
         // restore context
         this._private.context.restore();
-    };
 
-    // point hit test
-    ZUI.RenderedObject.Rectangle.prototype.pointHitTest = function(x, y) {
-        this._private.context.isPointInPath(x, y);
+        // set update flag
+        this._private.isUpdated = false;
     };
 
 })();
