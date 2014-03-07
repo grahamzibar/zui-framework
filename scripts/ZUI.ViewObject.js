@@ -4,9 +4,10 @@
  */
 
 /* Class constructor */
-ZUI.ViewObject = function(attributes) {
-	/* Append self to ZUI's global view objects array */
-	ZUI.viewObjects.push(this);
+ZUI.ViewObject = function(attributes, view) {
+    this.view = view;
+
+    this.view.viewObjects.push(this);
 
 	/* Get shape */
 	if (!attributes.shape) return null;
