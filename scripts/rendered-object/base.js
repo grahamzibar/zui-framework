@@ -1,45 +1,31 @@
 (function () {
 
     // constructor
-    ZUI.Primitive.Base = function () {
+    ZUI.RenderedObject.Base = function (properties) {
         // save scope for access by child scopes
         var that = this;
 
-        // privates
+        // private properties
         that._private = {
-            view: arguments[0],
-            isUpdated: true
+            isUpdated: true,
+            isReady: false
         };
-
-        // confirm parent view is valid
-        if (!(this._private.view instanceof ZUI.View.Base)) {
-            throw {
-                name: 'Exception',
-                message: 'Invalid parent view for primitive constructor.'
-            }
-        }
-
-        // append this primitive to the parent view's array of rendered objects
-        this._private.view.renderedObjects.push(this);
-
-        // get properties as object
-        var properties = arguments[1];
 
         // transfer properties to this object
         for (var propertyName in properties) {
             that[propertyName] = properties[propertyName];
         }
 
-        // check for universal properties
+        // assign default to undefined properties
         //   data
-        //   position {x, y, <scale>}
+        //   position {x, y, scale}
         //   stroke
         //   strokeColor
         //   strokeThickness
         //   fill
         //   fillColor
         //   alpha
-        //   centerAt
+        //   centerAt {horizontal, vertical}
         (function () {
             // define default properties
             var defaultProperties = {
@@ -69,7 +55,7 @@
     };
 
     // getter
-    ZUI.Primitive.Base.prototype.get = function() {
+    ZUI.RenderedObject.Base.prototype.get = function() {
         var obj = this;
         var propertyName = arguments[0];
         if (propertyName === undefined || propertyName === null) {
@@ -92,7 +78,7 @@
     };
 
     // setter
-    ZUI.Primitive.Base.prototype.set = function() {
+    ZUI.RenderedObject.Base.prototype.set = function() {
         var obj = this;
         var propertyName = arguments[0];
         if (propertyName === undefined || propertyName === null) {
@@ -116,12 +102,20 @@
         return obj[propertyName] = arguments[n + 1];
     }
 
-    // remove
-    ZUI.Primitive.Base.prototype.remove = function () {
+    // add to view
+    ZUI.RenderedObject.Base.prototype.addToView = function(view) {
+        this._private.view = view;
+        view.renderedObjects.push(this);
+        return this;
+    };
+
+    // remove from view
+    ZUI.RenderedObject.Base.prototype.removeFromView = function () {
         ZUI.Helper.removeFromArray(this._private.view.renderedObjects, this);
+        return this;
     };
 
     // render (abstract)
-    ZUI.Primitive.Base.prototype.render = function () {};
+    ZUI.RenderedObject.Base.prototype.render = function () {};
 
 })();

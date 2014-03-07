@@ -1,6 +1,6 @@
 (function() {
 
     // add namespace
-    ZUI.Primitive = {};
+    ZUI.RenderedObject = {};
 
 })();
