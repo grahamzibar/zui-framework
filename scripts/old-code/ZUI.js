@@ -53,7 +53,7 @@ ZUI.touchStatus = {			// Touch status
 };
 ZUI.appStatus = {			// Application status
 	start: 0,
-	progress: 0,
+	progress: 0
 };
 ZUI.background = {			// Background color
 	red : 255,
