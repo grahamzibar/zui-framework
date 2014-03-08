@@ -87,8 +87,8 @@
     ZUI.Camera.DefaultCamera.prototype.projectPoint = function(point) {
         var pixelsPerUnit = ZUI.width / (Math.tan(this.fov / 2) * this.trueDistance * 2);
         return {
-            x: (x - ZUI.camera._x) * pixelsPerUnit + ZUI.width / 2,
-            y: (y - ZUI.camera._y) * pixelsPerUnit + ZUI.height / 2,
+            x: (point.x - ZUI.camera._x) * pixelsPerUnit + ZUI.width / 2,
+            y: (point.y - ZUI.camera._y) * pixelsPerUnit + ZUI.height / 2
         };
     };
 
@@ -96,8 +96,8 @@
     ZUI.Camera.DefaultCamera.prototype.unprojectPoint = function(point) {
         var pixelsPerUnit = ZUI.width / (Math.tan(this.fov / 2) * this.trueDistance * 2);
         return {
-            x: (x - ZUI.width / 2) / pixelsPerUnit + ZUI.camera.truePosition.x,
-            y: (y - ZUI.height / 2) / pixelsPerUnit + ZUI.camera.truePosition.y
+            x: (point.x - ZUI.width / 2) / pixelsPerUnit + ZUI.camera.truePosition.x,
+            y: (point.y - ZUI.height / 2) / pixelsPerUnit + ZUI.camera.truePosition.y
         };
     };
 

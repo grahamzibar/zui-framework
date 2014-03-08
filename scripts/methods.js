@@ -18,7 +18,7 @@
                 width: 900,
                 height: 600,
                 background: '#FFFFFF',
-                backgroundAlpha: 1,
+                backgroundAlpha: 0,
                 frameRate: 30,
                 cameraFollowRate: 1
             };
@@ -107,12 +107,14 @@
             if (isRedraw) {
                 // clear canvas
                 ZUI.context.clearRect(0, 0, ZUI.width, ZUI.height);
-                ZUI.context.save();
-                ZUI.context.globalAlpha = ZUI.backgroundAlpha;
-                ZUI.context.strokeStyle = ZUI.background;
-                ZUI.context.fillStyle = ZUI.background;
-                ZUI.context.fillRect(0, 0, ZUI.width, ZUI.height)
-                ZUI.context.restore();
+                if (ZUI.backgroundAlpha > 0) {
+                    ZUI.context.save();
+                    ZUI.context.globalAlpha = ZUI.backgroundAlpha;
+                    ZUI.context.strokeStyle = ZUI.background;
+                    ZUI.context.fillStyle = ZUI.background;
+                    ZUI.context.fillRect(0, 0, ZUI.width, ZUI.height)
+                    ZUI.context.restore();
+                }
 
                 // draw active view's rendered objects
                 for (var n = 0; n < ZUI.activeView.renderedObjects.length; n++) {
