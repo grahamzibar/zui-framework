@@ -1,5 +1,6 @@
 (function() {
 
+    // constructor
     ZUI.Base = function() {
         this._private = {};
     };

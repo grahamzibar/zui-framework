@@ -11,6 +11,7 @@
         this._private.canvas = document.createElement('canvas');
         this._private.context = this._private.canvas.getContext('2d');
         this._private.views = [];
+        this._private.isHovered = false;
 
         // set canvas size
         this._private.canvas.width = ZUI.width;
