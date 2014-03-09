@@ -116,14 +116,14 @@
 
             // render rendered objects if needed
             for (var n = 0; n < ZUI.activeView.renderedObjects.length; n++) {
-                if (ZUI.activeView.renderedObjects[n].isReady && ZUI.activeView.renderedObjects[n].isUpdated) {
+                if (ZUI.activeView.renderedObjects[n]._private.isReady && ZUI.activeView.renderedObjects[n]._private.isUpdated) {
                     ZUI.activeView.renderedObjects[n].render();
-                    ZUI.activeView.renderedObjects[n].isUpdated = false;
+                    ZUI.activeView.renderedObjects[n]._private.isUpdated = false;
                 }
             }
 
             // draw view if needed
-            if (ZUI.activeView.isUpdated) {
+            if (ZUI.activeView._private.isUpdated) {
                 // clear canvas
                 ZUI.context.clearRect(0, 0, ZUI.width, ZUI.height);
                 if (ZUI.backgroundAlpha > 0) {
@@ -137,10 +137,13 @@
 
                 // draw active view's rendered objects
                 for (var n = 0; n < ZUI.activeView.renderedObjects.length; n++) {
-                    if (ZUI.activeView.renderedObjects[n].isReady) {
+                    if (ZUI.activeView.renderedObjects[n]._private.isReady) {
                         ZUI.activeView.renderedObjects[n].draw();
                     }
                 }
+
+                // reset updated flag
+                ZUI.activeView._private.isUpdated = false;
             }
 
             // check for mouse over/out events

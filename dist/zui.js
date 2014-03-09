@@ -826,14 +826,14 @@
 
             // render rendered objects if needed
             for (var n = 0; n < ZUI.activeView.renderedObjects.length; n++) {
-                if (ZUI.activeView.renderedObjects[n].isUpdated) {
+                if (ZUI.activeView.renderedObjects[n]._private.isReady && ZUI.activeView.renderedObjects[n]._private.isUpdated) {
                     ZUI.activeView.renderedObjects[n].render();
-                    ZUI.activeView.renderedObjects[n].isUpdated = false;
+                    ZUI.activeView.renderedObjects[n]._private.isUpdated = false;
                 }
             }
 
             // draw view if needed
-            if (ZUI.activeView.isUpdated) {
+            if (ZUI.activeView._private.isUpdated) {
                 // clear canvas
                 ZUI.context.clearRect(0, 0, ZUI.width, ZUI.height);
                 if (ZUI.backgroundAlpha > 0) {
@@ -847,8 +847,13 @@
 
                 // draw active view's rendered objects
                 for (var n = 0; n < ZUI.activeView.renderedObjects.length; n++) {
-                    ZUI.activeView.renderedObjects[n].draw();
+                    if (ZUI.activeView.renderedObjects[n]._private.isReady) {
+                        ZUI.activeView.renderedObjects[n].draw();
+                    }
                 }
+
+                // reset updated flag
+                ZUI.activeView._private.isUpdated = false;
             }
 
             // check for mouse over/out events
@@ -1269,6 +1274,8 @@
     ZUI.View = function() {
         // call base constructor
         ZUI.Base.call(this);
+
+        this._private.isUpdated = true;
 
         this.renderedObjects = [];
         this.animations = [];
@@ -1790,7 +1797,7 @@
     ZUI.RenderedObject.Base.prototype.update = function() {
         this._private.isUpdated = true;
         for (var n = 0; n < this._private.views.length; n++) {
-            this._private.views[n].isUpdated = true;
+            this._private.views[n]._private.isUpdated = true;
         }
     }
 
@@ -1798,7 +1805,7 @@
     ZUI.RenderedObject.Base.prototype.attachToView = function(view) {
         this._private.views.push(view);
         view.renderedObjects.push(this);
-        view.isUpdated = true;
+        view._private.isUpdated = true;
         return this;
     };
 
@@ -1806,7 +1813,7 @@
     ZUI.RenderedObject.Base.prototype.detachFromView = function (view) {
         ZUI.Helper.removeFromArray(this._private.views, view);
         ZUI.Helper.removeFromArray(view.renderedObjects, this);
-        view.isUpdated = true;
+        view._private.isUpdated = true;
         return this;
     };
 
@@ -1844,6 +1851,10 @@
     // force render
     ZUI.RenderedObject.Base.prototype.forceRender = function () {
         this._private.isUpdated = true;
+
+        for (var n = 0; n < this._private.views.length; n++) {
+            this._private.views[n]._private.isUpdated = true;
+        }
     };
 
     // remove
@@ -2290,6 +2301,127 @@
 })();
 
 
+(function() {
+
+    // constructor
+    ZUI.RenderedObject.SVG = function(properties) {
+        // call base constructor
+        ZUI.RenderedObject.Base.call(this, properties);
+
+        // save scope for access by child scopes
+        var that = this;
+
+        // assign default to undefined properties
+        //   width
+        //   widthScale
+        //   height
+        //   heightScale
+        //   url
+        //   dataString
+        (function () {
+            // define default properties
+            var defaultProperties = {
+                width: 0,
+                widthScale: ZUI.Def.WorldScale,
+                height: 0,
+                heightScale: ZUI.Def.WorldScale,
+                url: '',
+                dataString: null
+            };
+
+            // assign default to undefined properties
+            for (var propertyName in defaultProperties) {
+                ZUI.Helper.assignDefaultProperty(propertyName, that, defaultProperties[propertyName]);
+            }
+        })();
+
+        // load svg
+        if (!this.dataString) {
+            $.get(this.url, (function(data) {
+                var svg = data.getElementsByTagName("svg")[0];
+                this._private.width = svg.getAttribute("width");
+                if (this._private.width.indexOf("px") >= 0) this._private.width = Number(this._private.width.substring(0, this._private.width.indexOf("px")));
+                this._private.height = svg.getAttribute("height");
+                if (this._private.height.indexOf("px") >= 0) this._private.height = Number(this._private.height.substring(0, this._private.height.indexOf("px")));
+                var paths = svg.getElementsByTagName("path");
+                this._private.paths = [];
+                for (var n = 0; n < paths.length; n++) {
+                    var path = {};
+                    path.id = paths[n].getAttribute("id");
+                    path.instructions = ZUI.Helper.parseSVGPath(paths[n].getAttribute("d"));
+                    this._private.paths.push(path);
+                }
+                this._private.isReady = true;
+            }).bind(this));
+        }
+        else {
+            var xmlDoc = (new DOMParser()).parseFromString(this.dataString, "text/xml");
+            var svg = xmlDoc.getElementsByTagName("svg")[0];
+            this._private.width = svg.getAttribute("width");
+            if (this._private.width.indexOf("px") >= 0) this._private.width = Number(this._private.width.substring(0, this._private.width.indexOf("px")));
+            this._private.height = svg.getAttribute("height");
+            if (this._private.height.indexOf("px") >= 0) this._private.height = Number(this._private.height.substring(0, this._private.height.indexOf("px")));
+            var paths = svg.getElementsByTagName("path");
+            this._private.paths = [];
+            for (var n = 0; n < paths.length; n++) {
+                var path = {};
+                path.id = paths[n].getAttribute("id");
+                path.instructions = ZUI.Helper.parseSVGPath(paths[n].getAttribute("d"));
+                this._private.paths.push(path);
+            }
+            this._private.isReady = true;
+        }
+    };
+
+    // inherit base prototype
+    ZUI.Helper.inheritClass(ZUI.RenderedObject.Base, ZUI.RenderedObject.SVG);
+
+    // render
+    ZUI.RenderedObject.SVG.prototype.render = function () {
+        // call base method
+        ZUI.RenderedObject.Base.prototype.render.call(this);
+
+        // get rendered size
+        this.renderedWidth = ZUI.Helper.interpretScale(this.width, this.widthScale);
+        this.renderedHeight = ZUI.Helper.interpretScale(this.height, this.heightScale);
+
+        // get adjusted position
+        var adjustedPosition = ZUI.Helper.interpretCenterAt(this.renderedPosition, this.renderedPositionOffset, this.renderedWidth, this.renderedHeight, this.centerAt);
+
+        // set up context
+        this._private.context.save();
+        this._private.context.strokeStyle = this.strokeColor;
+        this._private.context.fillStyle = this.fillColor;
+        this._private.context.globalAlpha = this.alpha;
+        this._private.context.lineWidth = this.renderedStrokeThickness;
+
+        // render
+        this._private.context.save();
+        this._private.context.translate(adjustedPosition.x, adjustedPosition.y);
+        this._private.context.scale(this.renderedWidth / this._private.width * this.hStretch, this.renderedHeight / this._private.height * this.vStretch);
+        this._private.context.rotate(this.rotate);
+        this._private.context.beginPath();
+        for (var n = 0; n < this._private.paths.length; n++) {
+            var path = this._private.paths[n];
+            for (var m = 0; m < path.instructions.length; m++) {
+                var instruction = path.instructions[m];
+                this._private.context[instruction.type].apply(this._private.context, instruction.args);
+            }
+        }
+        this._private.context.closePath();
+        this._private.context.restore();
+        if (this.stroke) {
+            this._private.context.stroke();
+        }
+        if (this.fill) {
+            this._private.context.fill();
+        }
+
+        // restore context
+        this._private.context.restore();
+    };
+
+})();
 
 
 (function() {
@@ -2307,9 +2439,11 @@
 
         // assign default to undefined properties
         //   width
+        //   widthScale
         //   height
+        //   heightScale
         //   url
-        //   data
+        //   dataString
         //   type
         (function () {
             // define default properties
@@ -2319,7 +2453,7 @@
                 height: 0,
                 heightScale: ZUI.Def.WorldScale,
                 url: '',
-                data: null,
+                dataString: null,
                 type: 'png'
             };
 
@@ -2333,11 +2467,11 @@
         this._private.image.onload = (function() {
             this._private.isReady = true;
         }).bind(this);
-        if (!this.data) {
+        if (!this.dataString) {
             this._private.image.src = this.url;
         }
         else {
-            this._private.image.src = 'data:image/' + this.type + ';base64,' + this.data;
+            this._private.image.src = 'data:image/' + this.type + ';base64,' + this.dataString;
         }
     };
 
@@ -2354,10 +2488,7 @@
         this.renderedHeight = ZUI.Helper.interpretScale(this.height, this.heightScale);
 
         // get adjusted position
-        var adjustedPosition = ZUI.Helper.interpretCenterAt({
-            x: this.renderedPosition.x + this.renderedRadius,
-            y: this.renderedPosition.y + this.renderedRadius
-        }, this.renderedPositionOffset, this.renderedRadius * 2, this.renderedRadius * 2, this.centerAt);
+        var adjustedPosition = ZUI.Helper.interpretCenterAt(this.renderedPosition, this.renderedPositionOffset, this.renderedWidth, this.renderedHeight, this.centerAt);
 
         // set up context
         this._private.context.save();

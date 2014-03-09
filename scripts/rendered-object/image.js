@@ -17,7 +17,7 @@
         //   height
         //   heightScale
         //   url
-        //   data
+        //   dataString
         //   type
         (function () {
             // define default properties
@@ -27,7 +27,7 @@
                 height: 0,
                 heightScale: ZUI.Def.WorldScale,
                 url: '',
-                data: null,
+                dataString: null,
                 type: 'png'
             };
 
@@ -41,11 +41,11 @@
         this._private.image.onload = (function() {
             this._private.isReady = true;
         }).bind(this);
-        if (!this.data) {
+        if (!this.dataString) {
             this._private.image.src = this.url;
         }
         else {
-            this._private.image.src = 'data:image/' + this.type + ';base64,' + this.data;
+            this._private.image.src = 'data:image/' + this.type + ';base64,' + this.dataString;
         }
     };
 

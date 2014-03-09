@@ -2,6 +2,7 @@
 <html>
 <head>
 
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script type="text/javascript" src="dist/zui.js"></script>
 
 </head>
@@ -41,27 +42,6 @@
         });
         this.border.attachToView(this);
 
-var shape = new ZUI.RenderedObject.Shape({
-    position: {
-        x: 0,
-        y: 0
-    },
-    positionScale: ZUI.Def.ScreenScale,
-    paths: [
-        "M0 0 L-75 200 L75 200 Q10 20 100 100 Z"
-    ],
-    eventListeners: {
-        mouseOver: function() {
-            console.log('mouse over');
-        },
-        mouseOut: function() {
-            console.log('mouse out');
-        }
-    }
-});
-shape.attachToView(this);
-console.log(shape);
-
         /* Array to keep track of all the lines drawn */
         this.lines = [];
     }
@@ -98,7 +78,7 @@ console.log(shape);
             }],
             verticesScale: [ZUI.Def.ScreenScale],
             strokeColor: "#000000",
-            strokeWidth: 2,
+            strokeWidth: 1,
             fill: false
         });
         line.attachToView(this);

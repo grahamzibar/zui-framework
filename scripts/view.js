@@ -5,6 +5,8 @@
         // call base constructor
         ZUI.Base.call(this);
 
+        this._private.isUpdated = true;
+
         this.renderedObjects = [];
         this.animations = [];
     };

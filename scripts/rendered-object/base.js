@@ -88,7 +88,7 @@
     ZUI.RenderedObject.Base.prototype.update = function() {
         this._private.isUpdated = true;
         for (var n = 0; n < this._private.views.length; n++) {
-            this._private.views[n].isUpdated = true;
+            this._private.views[n]._private.isUpdated = true;
         }
     }
 
@@ -96,7 +96,7 @@
     ZUI.RenderedObject.Base.prototype.attachToView = function(view) {
         this._private.views.push(view);
         view.renderedObjects.push(this);
-        view.isUpdated = true;
+        view._private.isUpdated = true;
         return this;
     };
 
@@ -104,7 +104,7 @@
     ZUI.RenderedObject.Base.prototype.detachFromView = function (view) {
         ZUI.Helper.removeFromArray(this._private.views, view);
         ZUI.Helper.removeFromArray(view.renderedObjects, this);
-        view.isUpdated = true;
+        view._private.isUpdated = true;
         return this;
     };
 
@@ -142,6 +142,10 @@
     // force render
     ZUI.RenderedObject.Base.prototype.forceRender = function () {
         this._private.isUpdated = true;
+
+        for (var n = 0; n < this._private.views.length; n++) {
+            this._private.views[n]._private.isUpdated = true;
+        }
     };
 
     // remove

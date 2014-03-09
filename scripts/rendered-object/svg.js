@@ -14,7 +14,7 @@
         //   height
         //   heightScale
         //   url
-        //   data
+        //   dataString
         (function () {
             // define default properties
             var defaultProperties = {
@@ -23,7 +23,7 @@
                 height: 0,
                 heightScale: ZUI.Def.WorldScale,
                 url: '',
-                data: null
+                dataString: null
             };
 
             // assign default to undefined properties
@@ -33,30 +33,26 @@
         })();
 
         // load svg
-        if (!this.data) {
-            $.get({
-                url: this.url,
-                dataType: 'xml',
-                success: (function(data) {
-                    var svg = data.getElementsByTagName("svg")[0];
-                    this._private.width = svg.getAttribute("width");
-                    if (this._private.width.indexOf("px") >= 0) this._private.width = Number(this._private.width.substring(0, this._private.width.indexOf("px")));
-                    this._private.height = svg.getAttribute("height");
-                    if (this._private.height.indexOf("px") >= 0) this._private.height = Number(this._private.height.substring(0, this._private.height.indexOf("px")));
-                    var paths = svg.getElementsByTagName("path");
-                    this._private.paths = [];
-                    for (var n = 0; n < paths.length; n++) {
-                        var path = {};
-                        path.id = paths[n].getAttribute("id");
-                        path.instructions = ZUI.Helper.parseSVGPath(paths[n].getAttribute("d"));
-                        this._private.paths.push(path);
-                    }
-                    this.ready = true;
-                }).bind(this)
-            })
+        if (!this.dataString) {
+            $.get(this.url, (function(data) {
+                var svg = data.getElementsByTagName("svg")[0];
+                this._private.width = svg.getAttribute("width");
+                if (this._private.width.indexOf("px") >= 0) this._private.width = Number(this._private.width.substring(0, this._private.width.indexOf("px")));
+                this._private.height = svg.getAttribute("height");
+                if (this._private.height.indexOf("px") >= 0) this._private.height = Number(this._private.height.substring(0, this._private.height.indexOf("px")));
+                var paths = svg.getElementsByTagName("path");
+                this._private.paths = [];
+                for (var n = 0; n < paths.length; n++) {
+                    var path = {};
+                    path.id = paths[n].getAttribute("id");
+                    path.instructions = ZUI.Helper.parseSVGPath(paths[n].getAttribute("d"));
+                    this._private.paths.push(path);
+                }
+                this._private.isReady = true;
+            }).bind(this));
         }
         else {
-            var xmlDoc = (new DOMParser()).parseFromString(this.data, "text/xml");
+            var xmlDoc = (new DOMParser()).parseFromString(this.dataString, "text/xml");
             var svg = xmlDoc.getElementsByTagName("svg")[0];
             this._private.width = svg.getAttribute("width");
             if (this._private.width.indexOf("px") >= 0) this._private.width = Number(this._private.width.substring(0, this._private.width.indexOf("px")));
@@ -70,7 +66,7 @@
                 path.instructions = ZUI.Helper.parseSVGPath(paths[n].getAttribute("d"));
                 this._private.paths.push(path);
             }
-            this.ready = true;
+            this._private.isReady = true;
         }
     };
 
@@ -105,7 +101,7 @@
         for (var n = 0; n < this._private.paths.length; n++) {
             var path = this._private.paths[n];
             for (var m = 0; m < path.instructions.length; m++) {
-                var instruction = path.instructions[n];
+                var instruction = path.instructions[m];
                 this._private.context[instruction.type].apply(this._private.context, instruction.args);
             }
         }
