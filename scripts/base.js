@@ -3,6 +3,7 @@
     // constructor
     ZUI.Base = function() {
         this._private = {};
+        this._private.isUpdated = false;
     };
 
     // getter
@@ -51,9 +52,11 @@
             obj = {};
         }
 
-        this._private.isUpdated = true;
+        this.update(arguments.slice(0, n + 1), arguments[n + 1]);
 
         return obj[propertyName] = arguments[n + 1];
     };
 
-});
+    ZUI.Base.prototype.update = function (propertyName, value) {};
+
+})();

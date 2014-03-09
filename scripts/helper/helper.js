@@ -43,6 +43,25 @@
         return obj[propertyName];
     };
 
+    // get mouse position from event
+    ZUI.Helper.getMousePosition = function(event) {
+        var canvasBoundingRect = ZUI.canvas.getBoundingClientRect();
+        return {
+            x: event.clientX - canvasBoundingRect.left,
+            y: event.clientY - canvasBoundingRect.top
+        };
+    };
+
+    // disable pointer events on canvas
+    ZUI.Helper.disablePointerEvents = function() {
+        ZUI.canvas.style.pointerEvents = "none";
+    };
+
+    // restore point events on canvas
+    ZUI.Helper.restorePointerEvents = function() {
+        ZUI.canvas.style.pointerEvents = "auto";
+    };
+
     // interpret the scale option and returns the updated value
     ZUI.Helper.interpretScale = function(value, scale) {
         if (scale === ZUI.Def.ScreenScale) {
@@ -71,13 +90,13 @@
             y: position.y + positionOffset.y
         }
 
-        if (this.centerAt.horizontal === ZUI.Def.Left) {
+        if (centerAt.horizontal === ZUI.Def.Left) {
             adustedPosition.x -= 0;
         }
-        else if (this.centerAt.horizontal === ZUI.Def.Center) {
+        else if (centerAt.horizontal === ZUI.Def.Center) {
             adustedPosition.x -= width / 2;
         }
-        else if (this.centerAt.horizontal === ZUI.Def.Right) {
+        else if (centerAt.horizontal === ZUI.Def.Right) {
             adustedPosition.x -= width;
         }
         else {
@@ -87,13 +106,13 @@
             };
         }
 
-        if (this.centerAt.vertical === ZUI.Def.Top) {
+        if (centerAt.vertical === ZUI.Def.Top) {
             adustedPosition.y -= 0;
         }
-        else if (this.centerAt.vertical === ZUI.Def.Center) {
+        else if (centerAt.vertical === ZUI.Def.Center) {
             adustedPosition.y -= height / 2;
         }
-        else if (this.centerAt.vertical === ZUI.Def.Bottom) {
+        else if (centerAt.vertical === ZUI.Def.Bottom) {
             adustedPosition.y -= height;
         }
         else {

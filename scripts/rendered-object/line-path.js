@@ -27,7 +27,7 @@
                 verticesScale: []
             };
             for (var n = 0; n < that['vertices'].length; n++) {
-                defaultProperties.verticesScale.push('world');
+                defaultProperties.verticesScale.push(ZUI.Def.WorldScale);
             }
 
             // assign default to undefined properties
@@ -74,8 +74,8 @@
         for (var n = 1; n < this.renderedVertices.length; n++) {
             this._private.context.lineTo(this.renderedVertices[n].x, this.renderedVertices[n].y);
         }
-        this._private.context.closePath();
-        ZUI.context.restore();
+        //this._private.context.closePath();
+        this._private.context.restore();
         if (this.stroke) {
             this._private.context.stroke();
         }
@@ -85,9 +85,6 @@
 
         // restore context
         this._private.context.restore();
-
-        // set update flag
-        this._private.isUpdated = false;
     };
 
 })();

@@ -27,7 +27,7 @@ module.exports = function(grunt) {
                     'scripts/camera/default-camera.js',
                     'scripts/rendered-object/namespace.js',
                     'scripts/rendered-object/base.js',
-                    'scripts/rendered-object/rect.js',
+                    'scripts/rendered-object/rectangle.js',
                     'scripts/rendered-object/circle.js',
                     'scripts/rendered-object/text.js',
                     'scripts/rendered-object/line-path.js',

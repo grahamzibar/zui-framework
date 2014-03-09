@@ -10,6 +10,7 @@
     // constructor
     ZUI.Base = function() {
         this._private = {};
+        this._private.isUpdated = false;
     };
 
     // getter
@@ -58,12 +59,14 @@
             obj = {};
         }
 
-        this._private.isUpdated = true;
+        this.update(arguments.slice(0, n + 1), arguments[n + 1]);
 
         return obj[propertyName] = arguments[n + 1];
     };
 
-});
+    ZUI.Base.prototype.update = function (propertyName, value) {};
+
+})();
 
 (function() {
 
@@ -166,6 +169,25 @@
         return obj[propertyName];
     };
 
+    // get mouse position from event
+    ZUI.Helper.getMousePosition = function(event) {
+        var canvasBoundingRect = ZUI.canvas.getBoundingClientRect();
+        return {
+            x: event.clientX - canvasBoundingRect.left,
+            y: event.clientY - canvasBoundingRect.top
+        };
+    };
+
+    // disable pointer events on canvas
+    ZUI.Helper.disablePointerEvents = function() {
+        ZUI.canvas.style.pointerEvents = "none";
+    };
+
+    // restore point events on canvas
+    ZUI.Helper.restorePointerEvents = function() {
+        ZUI.canvas.style.pointerEvents = "auto";
+    };
+
     // interpret the scale option and returns the updated value
     ZUI.Helper.interpretScale = function(value, scale) {
         if (scale === ZUI.Def.ScreenScale) {
@@ -194,13 +216,13 @@
             y: position.y + positionOffset.y
         }
 
-        if (this.centerAt.horizontal === ZUI.Def.Left) {
+        if (centerAt.horizontal === ZUI.Def.Left) {
             adustedPosition.x -= 0;
         }
-        else if (this.centerAt.horizontal === ZUI.Def.Center) {
+        else if (centerAt.horizontal === ZUI.Def.Center) {
             adustedPosition.x -= width / 2;
         }
-        else if (this.centerAt.horizontal === ZUI.Def.Right) {
+        else if (centerAt.horizontal === ZUI.Def.Right) {
             adustedPosition.x -= width;
         }
         else {
@@ -210,13 +232,13 @@
             };
         }
 
-        if (this.centerAt.vertical === ZUI.Def.Top) {
+        if (centerAt.vertical === ZUI.Def.Top) {
             adustedPosition.y -= 0;
         }
-        else if (this.centerAt.vertical === ZUI.Def.Center) {
+        else if (centerAt.vertical === ZUI.Def.Center) {
             adustedPosition.y -= height / 2;
         }
-        else if (this.centerAt.vertical === ZUI.Def.Bottom) {
+        else if (centerAt.vertical === ZUI.Def.Bottom) {
             adustedPosition.y -= height;
         }
         else {
@@ -728,7 +750,7 @@
         ZUI.camera = new ZUI.Camera.DefaultCamera({});
 
         // create and set context menu
-        ZUI.contextMenu = new ZUI.ContextMenu();
+        ZUI.customContextMenu = new ZUI.ContextMenu();
 
         // set canvas size
         ZUI.canvas.width = ZUI.width;
@@ -754,6 +776,23 @@
 
         // initialize ZUI event listeners hash
         ZUI.eventListeners = new ZUI.Hash();
+
+        // initialize app status
+        ZUI.appStatus = {
+            start: 0,
+            progress: 0
+        };
+
+        // initialize mouse status
+        ZUI.mouseStatus = {
+            x: 0,
+            y: 0,
+            xLast: 0,
+            yLast: 0,
+            leftDown: false,
+            middleDown: false,
+            rightDown: false
+        };
 
         // set first view
         ZUI.activeView = new ZUI.View();
@@ -783,19 +822,18 @@
 
             // call update
             ZUI.update();
+            ZUI.activeView.update();
 
-            // check whether redraw is required
-            var isRedraw = false;
+            // render rendered objects if needed
             for (var n = 0; n < ZUI.activeView.renderedObjects.length; n++) {
                 if (ZUI.activeView.renderedObjects[n].isUpdated) {
                     ZUI.activeView.renderedObjects[n].render();
                     ZUI.activeView.renderedObjects[n].isUpdated = false;
-                    isRedraw = true;
                 }
             }
 
-            // redraw if needed
-            if (isRedraw) {
+            // draw view if needed
+            if (ZUI.activeView.isUpdated) {
                 // clear canvas
                 ZUI.context.clearRect(0, 0, ZUI.width, ZUI.height);
                 if (ZUI.backgroundAlpha > 0) {
@@ -819,7 +857,7 @@
             var renderedObjects = ZUI.activeView.renderedObjects;
             var renderedObject = null;
             for (var n = 0; n < renderedObjects.length; n++) {
-                if (renderedObjects[n].isInBound(x, y)) {
+                if (renderedObjects[n].pointHitTest(x, y)) {
                     renderedObject = renderedObjects[n];
                 }
             }
@@ -852,7 +890,7 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = renderedObjects.length - 1; n >= 0; n--) {
-            if (renderedObjects[n].isInBound(x, y)) {
+            if (renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
                 break;
             }
@@ -885,7 +923,7 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = renderedObjects.length - 1; n >= 0; n--) {
-            if (renderedObjects[n].isInBound(x, y)) {
+            if (renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
                 break;
             }
@@ -913,7 +951,7 @@
 
     // mousemove event handler
     ZUI.mouseMove = function(event) {
-        var mousePosition = ZUI.getMousePosition(event);
+        var mousePosition = ZUI.Helper.getMousePosition(event);
         ZUI.mouseStatus.xLast = ZUI.mouseStatus.x;
         ZUI.mouseStatus.yLast = ZUI.mouseStatus.y;
         ZUI.mouseStatus.x = mousePosition.x;
@@ -924,7 +962,7 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = 0; n < renderedObjects.length; n++) {
-            if (renderedObjects[n].isInBound(x, y)) {
+            if (renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
             }
         }
@@ -956,15 +994,15 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = renderedObjects.length - 1; n >= 0; n--) {
-            if (renderedObjects[n].isInBound(x, y)) {
+            if (renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
                 break;
             }
         }
 
         if (event.button == 0) {
-            if (ZUI.contextMenu.active) {
-                ZUI.contextMenu.close();
+            if (ZUI.customContextMenu.active) {
+                ZUI.customContextMenu.close();
             }
             ZUI.activeView.leftClick();
             if (renderedObject) renderedObject.leftClick();
@@ -989,7 +1027,7 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = renderedObjects.length - 1; n >= 0; n--) {
-            if (renderedObjects[n].isInBound(x, y)) {
+            if (renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
                 break;
             }
@@ -1018,7 +1056,7 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = renderedObjects.length - 1; n >= 0; n--) {
-            if (renderedObjects[n].isInBound(x, y)) {
+            if (renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
                 break;
             }
@@ -1038,7 +1076,7 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = renderedObjects.length - 1; n >= 0; n--) {
-            if (renderedObjects[n].isInBound(x, y)) {
+            if (renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
                 break;
             }
@@ -1178,13 +1216,15 @@
     };
 
     // active callback (abstract)
-    ZUI.View.prototype.active = function() {};
+    ZUI.View.prototype.active = function() {
+
+    };
 
     // inactive callback (abstract)
     ZUI.View.prototype.inactive = function() {};
 
-    // draw callback (abstract)
-    ZUI.View.prototype.draw = function() {};
+    // update callback (abstract)
+    ZUI.View.prototype.update = function() {};
 
     // remove callback (abstract)
     ZUI.View.prototype.remove = function() {};
@@ -1676,10 +1716,19 @@
     // inherit base
     ZUI.Helper.inheritClass(ZUI.Base, ZUI.RenderedObject.Base);
 
+    // property update callback
+    ZUI.RenderedObject.Base.prototype.update = function() {
+        this._private.isUpdated = true;
+        for (var n = 0; n < this._private.views.length; n++) {
+            this._private.views[n].isUpdated = true;
+        }
+    }
+
     // attach to view
     ZUI.RenderedObject.Base.prototype.attachToView = function(view) {
         this._private.views.push(view);
         view.renderedObjects.push(this);
+        view.isUpdated = true;
         return this;
     };
 
@@ -1687,6 +1736,7 @@
     ZUI.RenderedObject.Base.prototype.detachFromView = function (view) {
         ZUI.Helper.removeFromArray(this._private.views, view);
         ZUI.Helper.removeFromArray(view.renderedObjects, this);
+        view.isUpdated = true;
         return this;
     };
 
@@ -1706,8 +1756,11 @@
 
     // render (abstract)
     ZUI.RenderedObject.Base.prototype.render = function () {
+        // reset update flag
+        this._private.isUpdated = false;
+
         // clear canvas
-        this._private.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this._private.context.clearRect(0, 0, this._private.canvas.width, this._private.canvas.height);
 
         // get rendered position
         this.renderedPosition = ZUI.Helper.interpretScale(this.position, this.positionScale);
@@ -1718,7 +1771,149 @@
         this.renderedStrokeThickness = ZUI.Helper.interpretScale(this.strokeThickness, this.strokeThicknessScale);
     };
 
+    // force render
+    ZUI.RenderedObject.Base.prototype.forceRender = function () {
+        this._private.isUpdated = true;
+    };
+
+    // remove
+    ZUI.RenderedObject.Base.prototype.remove = function () {
+        // detach from all views
+        for (var n = 0; n < this._private.views.length; n++) {
+            this.detachFromView(this._private.views[n]);
+        }
+    }
+
 })();
+
+(function() {
+
+    // constructor
+    ZUI.RenderedObject.Rectangle = function(properties) {
+        // call base constructor
+        ZUI.RenderedObject.Base.call(this, properties);
+
+        // save scope for access by child scopes
+        var that = this;
+
+        // assign default to undefined properties
+        //   width
+        //   widthScale
+        //   height
+        //   heightScale
+        //   radius
+        //   radiusScale
+        //   ltRadius
+        //   ltRadiusScale
+        //   rtRadius
+        //   rtRadiusScale
+        //   lbRadius
+        //   lbRadiusScale
+        //   rbRadius
+        //   rbRadiusScale
+        (function () {
+            // define default properties (part 1)
+            var defaultProperties = {
+                width: 0,
+                widthScale: ZUI.Def.WorldScale,
+                height: 0,
+                heightScale: ZUI.Def.WorldScale,
+                radius: 0,
+                radiusScale: ZUI.Def.WorldScale
+            };
+
+            // assign default to undefined properties
+            for (var propertyName in defaultProperties) {
+                ZUI.Helper.assignDefaultProperty(propertyName, that, defaultProperties[propertyName]);
+            }
+
+            // define default properties (part 2)
+            var defaultProperties = {
+                ltRadius: that.radius,
+                ltRadiusScale: that.radiusScale,
+                rtRadius: that.radius,
+                rtRadiusScale: that.radiusScale,
+                lbRadius: that.radius,
+                lbRadiusScale: that.radiusScale,
+                rbRadius: that.radius,
+                rbRadiusScale: that.radiusScale
+            };
+
+            // assign default to undefined properties
+            for (var propertyName in defaultProperties) {
+                ZUI.Helper.assignDefaultProperty(propertyName, that, defaultProperties[propertyName]);
+            }
+        })();
+
+        // set ready flag
+        this._private.isReady = true;
+    };
+
+    // inherit base prototype
+    ZUI.Helper.inheritClass(ZUI.RenderedObject.Base, ZUI.RenderedObject.Rectangle);
+
+    // render
+    ZUI.RenderedObject.Rectangle.prototype.render = function () {
+        // call base method
+        ZUI.RenderedObject.Base.prototype.render.call(this);
+
+        // get rendered size
+        this.renderedWidth = ZUI.Helper.interpretScale(this.width, this.widthScale);
+        this.renderedHeight = ZUI.Helper.interpretScale(this.height, this.heightScale);
+        this.renderedRadius = ZUI.Helper.interpretScale(this.radius, this.radiusScale);
+        this.renderedLtRadius = ZUI.Helper.interpretScale(this.ltRadius, this.ltRadiusScale);
+        this.renderedRtRadius = ZUI.Helper.interpretScale(this.rtRadius, this.rtRadiusScale);
+        this.renderedLbRadius = ZUI.Helper.interpretScale(this.lbRadius, this.lbRadiusScale);
+        this.renderedRbRadius = ZUI.Helper.interpretScale(this.rbRadius, this.rbRadiusScale);
+
+        // adjust rendered radius
+        if (this.renderedRadius > this.renderedWidth / 2) this.renderedRadius = this.renderedWidth / 2;
+        if (this.renderedRadius > this.renderedHeight / 2) this.renderedRadius = this.renderedHeight / 2;
+        if (this.renderedLtRadius > this.renderedWidth / 2) this.renderedLtRadius = this.renderedWidth / 2;
+        if (this.renderedLtRadius > this.renderedHeight / 2) this.renderedLtRadius = this.renderedHeight / 2;
+        if (this.renderedRtRadius > this.renderedWidth / 2) this.renderedRtRadius = this.renderedWidth / 2;
+        if (this.renderedRtRadius > this.renderedHeight / 2) this.renderedRtRadius = this.renderedHeight / 2;
+        if (this.renderedLbRadius > this.renderedWidth / 2) this.renderedLbRadius = this.renderedWidth / 2;
+        if (this.renderedLbRadius > this.renderedHeight / 2) this.renderedLbRadius = this.renderedHeight / 2;
+        if (this.renderedRbRadius > this.renderedWidth / 2) this.renderedRbRadius = this.renderedWidth / 2;
+        if (this.renderedRbRadius > this.renderedHeight / 2) this.renderedRbRadius = this.renderedHeight / 2;
+
+        // get adjusted position
+        var adjustedPosition = ZUI.Helper.interpretCenterAt(this.renderedPosition, this.renderedPositionOffset, this.renderedWidth, this.renderedHeight, this.centerAt);
+
+        // set up context
+        this._private.context.save();
+        this._private.context.strokeStyle = this.strokeColor;
+        this._private.context.fillStyle = this.fillColor;
+        this._private.context.globalAlpha = this.alpha;
+        this._private.context.lineWidth = this.renderedStrokeThickness;
+
+        // render
+        this._private.context.save();
+        this._private.context.translate(adjustedPosition.x, adjustedPosition.y);
+        this._private.context.scale(this.hStretch, this.vStretch);
+        this._private.context.rotate(this.rotate);
+        this._private.context.beginPath();
+        this._private.context.moveTo(this.renderedLtRadius, 0);
+        this._private.context.arcTo(this.renderedWidth, 0, this.renderedWidth, this.renderedHeight, this.renderedRtRadius);
+        this._private.context.arcTo(this.renderedWidth, this.renderedHeight, 0, this.renderedHeight, this.renderedRbRadius);
+        this._private.context.arcTo(0, this.renderedHeight, 0, 0, this.renderedLbRadius);
+        this._private.context.arcTo(0, 0, this.renderedWidth, 0, this.renderedLtRadius);
+        this._private.context.closePath();
+        this._private.context.restore();
+        if (this.stroke) {
+            this._private.context.stroke();
+        }
+        if (this.fill) {
+            this._private.context.fill();
+        }
+
+        // restore context
+        this._private.context.restore();
+    };
+
+})();
+
 
 (function() {
 
@@ -1811,9 +2006,6 @@
 
         // restore context
         this._private.context.restore();
-
-        // set update flag
-        this._private.isUpdated = false;
     };
 
 })();
@@ -1850,7 +2042,7 @@
                 verticesScale: []
             };
             for (var n = 0; n < that['vertices'].length; n++) {
-                defaultProperties.verticesScale.push('world');
+                defaultProperties.verticesScale.push(ZUI.Def.WorldScale);
             }
 
             // assign default to undefined properties
@@ -1897,8 +2089,8 @@
         for (var n = 1; n < this.renderedVertices.length; n++) {
             this._private.context.lineTo(this.renderedVertices[n].x, this.renderedVertices[n].y);
         }
-        this._private.context.closePath();
-        ZUI.context.restore();
+        //this._private.context.closePath();
+        this._private.context.restore();
         if (this.stroke) {
             this._private.context.stroke();
         }
@@ -1908,9 +2100,6 @@
 
         // restore context
         this._private.context.restore();
-
-        // set update flag
-        this._private.isUpdated = false;
     };
 
 })();

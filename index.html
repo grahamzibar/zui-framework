@@ -2,139 +2,128 @@
 <html>
 <head>
 
-<script type="text/javascript" src="scripts/old-code/ZUI.js"></script>
-<script type="text/javascript" src="scripts/old-code/ZUI.HashMap.js"></script>
-<script type="text/javascript" src="scripts/old-code/ZUI.Util.js"></script>
-<script type="text/javascript" src="scripts/old-code/ZUI.Util.KeySpline.js"></script>
-<script type="text/javascript" src="scripts/old-code/ZUI.Math.js"></script>
-<script type="text/javascript" src="scripts/old-code/ZUI.Statistics.js"></script>
-<script type="text/javascript" src="scripts/old-code/ZUI.Geometry.js"></script>
-<script type="text/javascript" src="scripts/old-code/ZUI.Parser.js"></script>
-<script type="text/javascript" src="scripts/old-code/ZUI.camera.js"></script>
-<script type="text/javascript" src="scripts/old-code/ZUI.View.js"></script>
-<script type="text/javascript" src="scripts/old-code/ZUI.ViewObject.js"></script>
-<script type="text/javascript" src="scripts/old-code/ZUI.Event.js"></script>
-<script type="text/javascript" src="scripts/old-code/ZUI.EventListener.js"></script>
-<script type="text/javascript" src="scripts/old-code/ZUI.Animation.js"></script>
-<script type="text/javascript" src="scripts/old-code/ZUI.ContextMenu.js"></script>
-<script type="text/javascript" src="scripts/old-code/ZUI.ContextMenuOption.js"></script>
+<script type="text/javascript" src="dist/ZUI.js"></script>
 
 </head>
 <body>
+
 <h1>Welcome! This is a sample Canvas application built with <a href="https://github.com/yuzhenmi/zui-framework">zui-framework</a></h1>
 <p id="instructions"></p>
 <canvas id="zui-canvas">
-  Your browser does not support HTML5 Canvas.
+    Your browser does not support HTML5 Canvas.
 </canvas>
 
 <script type="text/javascript">
 
-/* Define DrawingBoardView constructor */
-function DrawingBoardView() {
-  /* Call parent constructor */
-  ZUI.View.call(this);
+    /* Define DrawingBoardView constructor */
+    function DrawingBoardView() {
+        /* Call parent constructor */
+        ZUI.View.call(this);
 
-  /* Border */
-  this.border = new ZUI.ViewObject({
-    shape: "rect",
-    positionScale: "screen",
-    sizeScale: "screen",
-    x: 0,
-    y: 0,
-    width: ZUI.width,
-    height: ZUI.height,
-    strokeColor: "#CC9933",
-    strokeWidth: 4,
-    fill: false,
-    centerAt: "left top"
-  });
-  
-  /* Array to keep track of all the lines drawn */
-  this.lines = [];
-}
-ZUI.Util.inheritClass(ZUI.View, DrawingBoardView);  // Inherit parent prototype
+        /* Border */
+        this.border = new ZUI.RenderedObject.Rectangle({
+            position: {
+                x: 0,
+                y: 0
+            },
+            positionScale: ZUI.Def.ScreenScale,
+            centerAt: {
+                horizontal: ZUI.Def.Left,
+                vertical: ZUI.Def.Top
+            },
+            width: ZUI.width,
+            widthScale: ZUI.Def.ScreenScale,
+            height: ZUI.height,
+            heightScale: ZUI.Def.ScreenScale,
+            strokeColor: "#CC9933",
+            strokeWidth: 4,
+            fill: false
+        });
+        this.border.attachToView(this);
 
-/* Override active callback method */
-DrawingBoardView.prototype.active = function() {
-  /* Update instructions */
-  document.getElementById("instructions").innerHTML = "Hold down your left mouse key and drag your mouse to draw lines on the board. Right click to clear the board.";
-}
 
-/* Override inactive callback method */
-DrawingBoardView.prototype.inactive = function() {
-  /* Clear instructions */
-  document.getElementById("instructions").innerHTML = "";
-}
+        /* Array to keep track of all the lines drawn */
+        this.lines = [];
+    }
+    ZUI.Helper.inheritClass(ZUI.View, DrawingBoardView);  // Inherit parent prototype
 
-/* Override draw callback method */
-DrawingBoardView.prototype.draw = function() {
-  /* Draw lines */
-  for (var n = 0; n < this.lines.length; n++) {
-    this.lines[n].draw();
-  }
+    /* Override active callback method */
+    DrawingBoardView.prototype.active = function() {
+        /* Update instructions */
+        document.getElementById("instructions").innerHTML = "Hold down your left mouse key and drag your mouse to draw lines on the board. Right click to clear the board.";
+    }
 
-  /* Draw border */
-  this.border.draw();
-};
+    /* Override inactive callback method */
+    DrawingBoardView.prototype.inactive = function() {
+        /* Clear instructions */
+        document.getElementById("instructions").innerHTML = "";
+    }
 
-/* Override leftMouseDown callback method */
-DrawingBoardView.prototype.leftMouseDown = function() {
-  /* Create new line */
-  this.lines.push(new ZUI.ViewObject({
-    shape: "path",
-    positionScale: "screen",
-    sizeScale: "screen",
-    x: 0,
-    y: 0,
-    strokeColor: "#000000",
-    strokeWidth: 2,
-    centerAt: "left top",
-    vertices: [{
-      x: ZUI.mouseStatus.x,
-      y: ZUI.mouseStatus.y
-    }]
-  }));
-};
+    /* Override update callback method */
+    DrawingBoardView.prototype.update = function() {
+    };
 
-/* Override mouseMove callback method */
-DrawingBoardView.prototype.mouseMove = function() {
-  /* Check if left mouse button is pressed down */
-  if (ZUI.mouseStatus.leftDown) {
-    /* Add new vertex to the line that is currently being drawn */
-    this.lines[this.lines.length - 1].private.vertices.push({
-      x: ZUI.mouseStatus.x,
-      y: ZUI.mouseStatus.y
-    });
+    /* Override leftMouseDown callback method */
+    DrawingBoardView.prototype.leftMouseDown = function() {
+        /* Create new line */
+        var line = new ZUI.RenderedObject.LinePath({
+            position: {
+                x: 0,
+                y: 0
+            },
+            positionScale: ZUI.Def.ScreenScale,
+            vertices: [{
+                x: ZUI.mouseStatus.x,
+                y: ZUI.mouseStatus.y
+            }],
+            verticesScale: [ZUI.Def.ScreenScale],
+            strokeColor: "#000000",
+            strokeWidth: 2,
+            fill: false
+        });
+        line.attachToView(this);
+        this.lines.push(line);
+    };
 
-    /* Set redraw flag to true */
-    this.lines[this.lines.length - 1].redraw = true;
-  }
-};
+    /* Override mouseMove callback method */
+    DrawingBoardView.prototype.mouseMove = function() {
+        /* Check if left mouse button is pressed down */
+        if (ZUI.mouseStatus.leftDown) {
+            /* Add new vertex to the line that is currently being drawn */
+            this.lines[this.lines.length - 1].get('vertices').push({
+                x: ZUI.mouseStatus.x,
+                y: ZUI.mouseStatus.y
+            });
+            this.lines[this.lines.length - 1].get('verticesScale').push(ZUI.Def.ScreenScale);
+            this.lines[this.lines.length - 1].forceRender();
+        }
+    };
 
-/* Override rightClick callback method */
-DrawingBoardView.prototype.rightMouseUp = function() {
-  this.eraseBoard();
-};
+    /* Override rightClick callback method */
+    DrawingBoardView.prototype.rightMouseUp = function() {
+        this.eraseBoard();
+    };
 
-/* Override remove callback method */
-DrawingBoardView.prototype.remove = function() {
-  /* Erase board */
-  this.eraseBoard();
+    /* Override remove callback method */
+    DrawingBoardView.prototype.remove = function() {
+        /* Erase board */
+        this.eraseBoard();
 
-  /* Remove border */
-  this.border.remove();
-};
+        /* Remove border */
+        this.border.remove();
+    };
 
-/* Erase board */
-DrawingBoardView.prototype.eraseBoard = function() {
-  /* Remove lines */
-  for (var n = 0; n < this.lines.length; n++) {
-    this.lines[n].remove();
-  }
-  this.lines = [];
-};
+    /* Erase board */
+    DrawingBoardView.prototype.eraseBoard = function() {
+        /* Remove lines */
+        for (var n = 0; n < this.lines.length; n++) {
+            this.lines[n].remove();
+        }
+        this.lines = [];
+    };
 
 </script>
+
 
 <script type="text/javascript">
 

@@ -40,7 +40,7 @@
         ZUI.camera = new ZUI.Camera.DefaultCamera({});
 
         // create and set context menu
-        ZUI.contextMenu = new ZUI.ContextMenu();
+        ZUI.customContextMenu = new ZUI.ContextMenu();
 
         // set canvas size
         ZUI.canvas.width = ZUI.width;
@@ -66,6 +66,23 @@
 
         // initialize ZUI event listeners hash
         ZUI.eventListeners = new ZUI.Hash();
+
+        // initialize app status
+        ZUI.appStatus = {
+            start: 0,
+            progress: 0
+        };
+
+        // initialize mouse status
+        ZUI.mouseStatus = {
+            x: 0,
+            y: 0,
+            xLast: 0,
+            yLast: 0,
+            leftDown: false,
+            middleDown: false,
+            rightDown: false
+        };
 
         // set first view
         ZUI.activeView = new ZUI.View();
@@ -95,19 +112,18 @@
 
             // call update
             ZUI.update();
+            ZUI.activeView.update();
 
-            // check whether redraw is required
-            var isRedraw = false;
+            // render rendered objects if needed
             for (var n = 0; n < ZUI.activeView.renderedObjects.length; n++) {
                 if (ZUI.activeView.renderedObjects[n].isUpdated) {
                     ZUI.activeView.renderedObjects[n].render();
                     ZUI.activeView.renderedObjects[n].isUpdated = false;
-                    isRedraw = true;
                 }
             }
 
-            // redraw if needed
-            if (isRedraw) {
+            // draw view if needed
+            if (ZUI.activeView.isUpdated) {
                 // clear canvas
                 ZUI.context.clearRect(0, 0, ZUI.width, ZUI.height);
                 if (ZUI.backgroundAlpha > 0) {
@@ -131,7 +147,7 @@
             var renderedObjects = ZUI.activeView.renderedObjects;
             var renderedObject = null;
             for (var n = 0; n < renderedObjects.length; n++) {
-                if (renderedObjects[n].isInBound(x, y)) {
+                if (renderedObjects[n].pointHitTest(x, y)) {
                     renderedObject = renderedObjects[n];
                 }
             }
@@ -164,7 +180,7 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = renderedObjects.length - 1; n >= 0; n--) {
-            if (renderedObjects[n].isInBound(x, y)) {
+            if (renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
                 break;
             }
@@ -197,7 +213,7 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = renderedObjects.length - 1; n >= 0; n--) {
-            if (renderedObjects[n].isInBound(x, y)) {
+            if (renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
                 break;
             }
@@ -225,7 +241,7 @@
 
     // mousemove event handler
     ZUI.mouseMove = function(event) {
-        var mousePosition = ZUI.getMousePosition(event);
+        var mousePosition = ZUI.Helper.getMousePosition(event);
         ZUI.mouseStatus.xLast = ZUI.mouseStatus.x;
         ZUI.mouseStatus.yLast = ZUI.mouseStatus.y;
         ZUI.mouseStatus.x = mousePosition.x;
@@ -236,7 +252,7 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = 0; n < renderedObjects.length; n++) {
-            if (renderedObjects[n].isInBound(x, y)) {
+            if (renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
             }
         }
@@ -268,15 +284,15 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = renderedObjects.length - 1; n >= 0; n--) {
-            if (renderedObjects[n].isInBound(x, y)) {
+            if (renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
                 break;
             }
         }
 
         if (event.button == 0) {
-            if (ZUI.contextMenu.active) {
-                ZUI.contextMenu.close();
+            if (ZUI.customContextMenu.active) {
+                ZUI.customContextMenu.close();
             }
             ZUI.activeView.leftClick();
             if (renderedObject) renderedObject.leftClick();
@@ -301,7 +317,7 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = renderedObjects.length - 1; n >= 0; n--) {
-            if (renderedObjects[n].isInBound(x, y)) {
+            if (renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
                 break;
             }
@@ -330,7 +346,7 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = renderedObjects.length - 1; n >= 0; n--) {
-            if (renderedObjects[n].isInBound(x, y)) {
+            if (renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
                 break;
             }
@@ -350,7 +366,7 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = renderedObjects.length - 1; n >= 0; n--) {
-            if (renderedObjects[n].isInBound(x, y)) {
+            if (renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
                 break;
             }

@@ -19,13 +19,15 @@
     };
 
     // active callback (abstract)
-    ZUI.View.prototype.active = function() {};
+    ZUI.View.prototype.active = function() {
+
+    };
 
     // inactive callback (abstract)
     ZUI.View.prototype.inactive = function() {};
 
-    // draw callback (abstract)
-    ZUI.View.prototype.draw = function() {};
+    // update callback (abstract)
+    ZUI.View.prototype.update = function() {};
 
     // remove callback (abstract)
     ZUI.View.prototype.remove = function() {};

@@ -82,10 +82,19 @@
     // inherit base
     ZUI.Helper.inheritClass(ZUI.Base, ZUI.RenderedObject.Base);
 
+    // property update callback
+    ZUI.RenderedObject.Base.prototype.update = function() {
+        this._private.isUpdated = true;
+        for (var n = 0; n < this._private.views.length; n++) {
+            this._private.views[n].isUpdated = true;
+        }
+    }
+
     // attach to view
     ZUI.RenderedObject.Base.prototype.attachToView = function(view) {
         this._private.views.push(view);
         view.renderedObjects.push(this);
+        view.isUpdated = true;
         return this;
     };
 
@@ -93,6 +102,7 @@
     ZUI.RenderedObject.Base.prototype.detachFromView = function (view) {
         ZUI.Helper.removeFromArray(this._private.views, view);
         ZUI.Helper.removeFromArray(view.renderedObjects, this);
+        view.isUpdated = true;
         return this;
     };
 
@@ -112,8 +122,11 @@
 
     // render (abstract)
     ZUI.RenderedObject.Base.prototype.render = function () {
+        // reset update flag
+        this._private.isUpdated = false;
+
         // clear canvas
-        this._private.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this._private.context.clearRect(0, 0, this._private.canvas.width, this._private.canvas.height);
 
         // get rendered position
         this.renderedPosition = ZUI.Helper.interpretScale(this.position, this.positionScale);
@@ -123,5 +136,18 @@
         // get rendered stroke thickness
         this.renderedStrokeThickness = ZUI.Helper.interpretScale(this.strokeThickness, this.strokeThicknessScale);
     };
+
+    // force render
+    ZUI.RenderedObject.Base.prototype.forceRender = function () {
+        this._private.isUpdated = true;
+    };
+
+    // remove
+    ZUI.RenderedObject.Base.prototype.remove = function () {
+        // detach from all views
+        for (var n = 0; n < this._private.views.length; n++) {
+            this.detachFromView(this._private.views[n]);
+        }
+    }
 
 })();

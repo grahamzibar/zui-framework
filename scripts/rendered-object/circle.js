@@ -89,9 +89,6 @@
 
         // restore context
         this._private.context.restore();
-
-        // set update flag
-        this._private.isUpdated = false;
     };
 
 })();
