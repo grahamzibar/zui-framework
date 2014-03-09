@@ -55,7 +55,7 @@
         }
 
         // get adjusted position
-        // scaleAt property does not apply for line paths
+        // centerAt property does not apply for line paths
 
         // set up context
         this._private.context.save();
@@ -74,7 +74,6 @@
         for (var n = 1; n < this.renderedVertices.length; n++) {
             this._private.context.lineTo(this.renderedVertices[n].x, this.renderedVertices[n].y);
         }
-        //this._private.context.closePath();
         this._private.context.restore();
         if (this.stroke) {
             this._private.context.stroke();

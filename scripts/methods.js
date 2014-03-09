@@ -147,20 +147,25 @@
             var renderedObjects = ZUI.activeView.renderedObjects;
             var renderedObject = null;
             for (var n = 0; n < renderedObjects.length; n++) {
-                if (renderedObjects[n].pointHitTest(x, y)) {
+                var hasEventListeners = false;
+                for (var foo in renderedObjects[n].eventListeners) {
+                    hasEventListeners = true;
+                    break;
+                }
+                if (hasEventListeners && renderedObjects[n].pointHitTest(x, y)) {
                     renderedObject = renderedObjects[n];
                 }
             }
             for (n = 0; n < renderedObjects.length; n++) {
                 if (renderedObjects[n] != renderedObject && renderedObjects[n]._private.isHovered) {
                     renderedObjects[n]._private.isHovered = false;
-                    renderedObjects[n].mouseOut();
+                    renderedObjects[n].eventListeners.mouseOut();
                 }
             }
             if (renderedObject) {
-                if (!renderedObject._private.isHovered) {
+                if (renderedObject.eventListeners.mouseOver && !renderedObject._private.isHovered) {
                     renderedObject._private.isHovered = true;
-                    renderedObject.mouseOver();
+                    renderedObject.eventListeners.mouseOver();
                 }
             }
         }
@@ -180,7 +185,12 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = renderedObjects.length - 1; n >= 0; n--) {
-            if (renderedObjects[n].pointHitTest(x, y)) {
+            var hasEventListeners = false;
+            for (var foo in renderedObjects[n].eventListeners) {
+                hasEventListeners = true;
+                break;
+            }
+            if (hasEventListeners && renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
                 break;
             }
@@ -189,17 +199,23 @@
         if (event.button == 0) {
             ZUI.mouseStatus.leftDown = true;
             ZUI.activeView.leftMouseDown();
-            if (renderedObject) renderedObject.leftMouseDown();
+            if (renderedObject && renderedObject.eventListeners.leftMouseDown) {
+                renderedObject.eventListeners.leftMouseDown();
+            }
         }
         else if (event.button == 1) {
             ZUI.mouseStatus.middleDown = true;
             ZUI.activeView.middleMouseDown();
-            if (renderedObject) renderedObject.middleMouseDown();
+            if (renderedObject && renderedObject.eventListeners.middleMouseDown) {
+                renderedObject.eventListeners.middleMouseDown();
+            }
         }
         else if (event.button == 2) {
             ZUI.mouseStatus.rightDown = true;
             ZUI.activeView.rightMouseDown();
-            if (renderedObject) renderedObject.rightMouseDown();
+            if (renderedObject && renderedObject.eventListeners.rightMouseDown) {
+                renderedObject.eventListeners.rightMouseDown();
+            }
         }
         if (ZUI.passInputEvent) {
             ZUI.passInputEvent(event);
@@ -213,7 +229,12 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = renderedObjects.length - 1; n >= 0; n--) {
-            if (renderedObjects[n].pointHitTest(x, y)) {
+            var hasEventListeners = false;
+            for (var foo in renderedObjects[n].eventListeners) {
+                hasEventListeners = true;
+                break;
+            }
+            if (hasEventListeners && renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
                 break;
             }
@@ -222,17 +243,23 @@
         if (event.button == 0) {
             ZUI.mouseStatus.leftDown = false;
             ZUI.activeView.leftMouseUp();
-            if (renderedObject) renderedObject.leftMouseUp();
+            if (renderedObject && renderedObject.eventListeners.leftMouseUp) {
+                renderedObject.eventListeners.leftMouseUp();
+            }
         }
         else if (event.button == 1) {
             ZUI.mouseStatus.middleDown = false;
             ZUI.activeView.middleMouseUp();
-            if (renderedObject) renderedObject.middleMouseUp();
+            if (renderedObject && renderedObject.eventListeners.middleMouseUp) {
+                renderedObject.eventListeners.middleMouseUp();
+            }
         }
         else if (event.button == 2) {
             ZUI.mouseStatus.rightDown = false;
             ZUI.activeView.rightMouseUp();
-            if (renderedObject) renderedObject.rightMouseUp();
+            if (renderedObject && renderedObject.eventListeners.rightMouseUp) {
+                renderedObject.eventListeners.rightMouseUp();
+            }
         }
         if (ZUI.passInputEvent) {
             ZUI.passInputEvent(event);
@@ -252,23 +279,30 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = 0; n < renderedObjects.length; n++) {
-            if (renderedObjects[n].pointHitTest(x, y)) {
+            var hasEventListeners = false;
+            for (var foo in renderedObjects[n].eventListeners) {
+                hasEventListeners = true;
+                break;
+            }
+            if (hasEventListeners && renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
             }
         }
 
         ZUI.activeView.mouseMove();
         for (n = 0; n < renderedObjects.length; n++) {
-            if (renderedObjects[n] != renderedObject && renderedObjects[n].isHovered) {
-                renderedObjects[n].isHovered = false;
-                renderedObjects[n].mouseOut();
+            if (renderedObjects[n] != renderedObject && renderedObjects[n]._private.isHovered) {
+                renderedObjects[n]._private.isHovered = false;
+                renderedObjects[n].eventListeners.mouseOut();
             }
         }
         if (renderedObject) {
-            renderedObject.mouseMove();
-            if (!renderedObject.isHovered) {
-                renderedObject.isHovered = true;
-                renderedObject.mouseOver();
+            if (renderedObject.eventListeners.mouseMove) {
+                renderedObject.eventListeners.mouseMove();
+            }
+            if (renderedObject.eventListeners.mouseOver && !renderedObject._private.isHovered) {
+                renderedObject._private.isHovered = true;
+                renderedObject.eventListeners.mouseOver();
             }
         }
 
@@ -284,7 +318,12 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = renderedObjects.length - 1; n >= 0; n--) {
-            if (renderedObjects[n].pointHitTest(x, y)) {
+            var hasEventListeners = false;
+            for (var foo in renderedObjects[n].eventListeners) {
+                hasEventListeners = true;
+                break;
+            }
+            if (hasEventListeners && renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
                 break;
             }
@@ -295,15 +334,21 @@
                 ZUI.customContextMenu.close();
             }
             ZUI.activeView.leftClick();
-            if (renderedObject) renderedObject.leftClick();
+            if (renderedObject && renderedObject.eventListeners.leftClick) {
+                renderedObject.eventListeners.leftClick();
+            }
         }
         else if (event.button == 1) {
             ZUI.activeView.middleClick();
-            if (renderedObject) renderedObject.middleClick();
+            if (renderedObject && renderedObject.eventListeners.middleClick) {
+                renderedObject.eventListeners.middleClick();
+            }
         }
         else if (event.button == 2) {
             ZUI.activeView.rightClick();
-            if (renderedObject) renderedObject.rightClick();
+            if (renderedObject && renderedObject.eventListeners.rightClick) {
+                renderedObject.eventListeners.rightClick();
+            }
         }
         if (ZUI.passInputEvent) {
             ZUI.passInputEvent(event);
@@ -317,7 +362,12 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = renderedObjects.length - 1; n >= 0; n--) {
-            if (renderedObjects[n].pointHitTest(x, y)) {
+            var hasEventListeners = false;
+            for (var foo in renderedObjects[n].eventListeners) {
+                hasEventListeners = true;
+                break;
+            }
+            if (hasEventListeners && renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
                 break;
             }
@@ -325,11 +375,15 @@
 
         if (event.button == 0) {
             ZUI.activeView.leftDoubleClick();
-            if (renderedObject) renderedObject.leftDoubleClick();
+            if (renderedObject && renderedObject.eventListeners.leftDoubleClick) {
+                renderedObject.eventListeners.leftDoubleClick();
+            }
         }
         else if (event.button == 1) {
             ZUI.activeView.middleDoubleClick();
-            if (renderedObject) renderedObject.middleDoubleClick();
+            if (renderedObject && renderedObject.eventListeners.middleDoubleClick) {
+                renderedObject.eventListeners.middleDoubleClick();
+            }
         }
         if (ZUI.passInputEvent) {
             ZUI.passInputEvent(event);
@@ -346,14 +400,21 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = renderedObjects.length - 1; n >= 0; n--) {
-            if (renderedObjects[n].pointHitTest(x, y)) {
+            var hasEventListeners = false;
+            for (var foo in renderedObjects[n].eventListeners) {
+                hasEventListeners = true;
+                break;
+            }
+            if (hasEventListeners && renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
                 break;
             }
         }
 
         ZUI.activeView.mouseWheel(scroll);
-        if (renderedObject) renderedObject.mouseWheel(scroll);
+        if (renderedObject && renderedObject.eventListeners.mouseWheel) {
+            renderedObject.eventListeners.mouseWheel(scroll);
+        }
         if (ZUI.passInputEvent) {
             ZUI.passInputEvent(event);
         }
@@ -366,14 +427,21 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = renderedObjects.length - 1; n >= 0; n--) {
-            if (renderedObjects[n].pointHitTest(x, y)) {
+            var hasEventListeners = false;
+            for (var foo in renderedObjects[n].eventListeners) {
+                hasEventListeners = true;
+                break;
+            }
+            if (hasEventListeners && renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
                 break;
             }
         }
 
         ZUI.activeView.contextMenu();
-        if (renderedObject) renderedObject.contextMenu();
+        if (renderedObject && renderedObject.eventListeners.contextMenu) {
+            renderedObject.eventListeners.contextMenu();
+        }
         if (ZUI.passInputEvent) {
             ZUI.passInputEvent(event);
         }

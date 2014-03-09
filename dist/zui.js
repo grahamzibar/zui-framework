@@ -349,16 +349,16 @@
     ZUI.Helper.parseSVGPath = function(path) {
         // splits the path string into instructions
         var instructions = [];
-        for (var n = 0; n + 1 < path.length;) {
+        for (var n = 0; n < path.length;) {
             var instruction = path[n];
-            var next = ZUI.Util.regexIndexOf(path, "[A-Za-z]", n + 1);
+            var next = ZUI.Helper.regexIndexOf(path, "[A-Za-z]", n + 1);
             if (next < 0) next = path.length;
             var args = path.substring(n + 1, next).replace(new RegExp("([0-9])-", "gi"), "$1,-").trim().replace(new RegExp("[\t\n ,]+", "gi"), ",").split(/[,]+/);
             for (var m = 0; m < args.length; m++) {
                 args[m] = Number(args[m]);
             }
             instructions.push({
-                instruction: instruction,
+                type: instruction,
                 args: args
             });
             n = next;
@@ -368,147 +368,147 @@
         var objs = []
         var lastX = 0, lastY = 0;
         for (n = 0; n < instructions.length; n++) {
-            if (instructions[n].instruction == "M") {			// moveto (absolute)
+            if (instructions[n].type == "M") {			// moveto (absolute)
                 var obj = {};
-                obj.instruction = "moveTo";
+                obj.type = "moveTo";
                 obj.args = [instructions[n].args[0], instructions[n].args[1]];
                 objs.push(obj);
                 lastX = instructions[n].args[0];
                 lastY = instructions[n].args[1];
             }
-            else if (instructions[n].instruction == "m") {		// moveto (relative)
+            else if (instructions[n].type == "m") {		// moveto (relative)
                 var obj = {};
-                obj.instruction = "moveTo";
+                obj.type = "moveTo";
                 obj.args = [instructions[n].args[0] + lastX, instructions[n].args[1] + lastY];
                 objs.push(obj);
                 lastX += instructions[n].args[0];
                 lastY += instructions[n].args[1];
             }
-            else if (instructions[n].instruction == "Z" || instructions[n].instruction == "z") {	// closepath
+            else if (instructions[n].type == "Z" || instructions[n].type == "z") {	// closepath
                 var obj = {};
-                obj.instruction = "closePath";
+                obj.type = "closePath";
                 obj.args = [];
                 objs.push(obj);
             }
-            else if (instructions[n].instruction == "L") {		// lineto (absolute)
+            else if (instructions[n].type == "L") {		// lineto (absolute)
                 var obj = {};
-                obj.instruction = "lineTo";
+                obj.type = "lineTo";
                 obj.args = [instructions[n].args[0], instructions[n].args[1]];
                 objs.push(obj);
                 lastX = instructions[n].args[0];
                 lastY = instructions[n].args[1];
             }
-            else if (instructions[n].instruction == "l") {		// lineto (relative)
+            else if (instructions[n].type == "l") {		// lineto (relative)
                 var obj = {};
-                obj.instruction = "lineTo";
+                obj.type = "lineTo";
                 obj.args = [instructions[n].args[0] + lastX, instructions[n].args[1] + lastY];
                 objs.push(obj);
                 lastX += instructions[n].args[0];
                 lastY += instructions[n].args[1];
             }
-            else if (instructions[n].instruction == "H") {		// horizontal lineto (absolute)
+            else if (instructions[n].type == "H") {		// horizontal lineto (absolute)
                 var obj = {};
-                obj.instruction = "lineTo";
+                obj.type = "lineTo";
                 obj.args = [instructions[n].args[0], lastY];
                 objs.push(obj);
                 lastX = instructions[n].args[0];
             }
-            else if (instructions[n].instruction == "h") {		// horizontal lineto (relative)
+            else if (instructions[n].type == "h") {		// horizontal lineto (relative)
                 var obj = {};
-                obj.instruction = "lineTo";
+                obj.type = "lineTo";
                 obj.args = [instructions[n].args[0] + lastX, lastY];
                 objs.push(obj);
                 lastX += instructions[n].args[0];
             }
-            else if (instructions[n].instruction == "V") {		// vertical lineto (absolute)
+            else if (instructions[n].type == "V") {		// vertical lineto (absolute)
                 var obj = {};
-                obj.instruction = "lineTo";
+                obj.type = "lineTo";
                 obj.args = [lastX, instructions[n].args[0]];
                 objs.push(obj);
                 lastY = instructions[n].args[0];
             }
-            else if (instructions[n].instruction == "v") {		// vertical lineto (relative)
+            else if (instructions[n].type == "v") {		// vertical lineto (relative)
                 var obj = {};
-                obj.instruction = "lineTo";
+                obj.type = "lineTo";
                 obj.args = [lastX, instructions[n].args[0] + lastY];
                 objs.push(obj);
                 lastY += instructions[n].args[0];
             }
-            else if (instructions[n].instruction == "C") {		// curveto (absolute)
+            else if (instructions[n].type == "C") {		// curveto (absolute)
                 var obj = {};
-                obj.instruction = "bezierCurveTo";
+                obj.type = "bezierCurveTo";
                 obj.args = [instructions[n].args[0], instructions[n].args[1], instructions[n].args[2], instructions[n].args[3], instructions[n].args[4], instructions[n].args[5]];
                 objs.push(obj);
                 lastX = instructions[n].args[4];
                 lastY = instructions[n].args[5];
             }
-            else if (instructions[n].instruction == "c") {		// curveto (relative)
+            else if (instructions[n].type == "c") {		// curveto (relative)
                 var obj = {};
-                obj.instruction = "bezierCurveTo";
+                obj.type = "bezierCurveTo";
                 obj.args = [instructions[n].args[0] + lastX, instructions[n].args[1] + lastY, instructions[n].args[2] + lastX, instructions[n].args[3] + lastY, instructions[n].args[4] + lastX, instructions[n].args[5] + lastY];
                 objs.push(obj);
                 lastX += instructions[n].args[4];
                 lastY += instructions[n].args[5];
             }
-            else if (instructions[n].instruction == "S") {		// shorthand/smooth curveto (absolute)
+            else if (instructions[n].type == "S") {		// shorthand/smooth curveto (absolute)
                 var obj = {};
-                obj.instruction = "bezierCurveTo";
+                obj.type = "bezierCurveTo";
                 obj.args = [lastX, lastY, instructions[n].args[0], instructions[n].args[1], instructions[n].args[2], instructions[n].args[3]];
                 objs.push(obj);
                 lastX = instructions[n].args[2];
                 lastY = instructions[n].args[3];
             }
-            else if (instructions[n].instruction == "s") {		// shorthand/smooth curveto (relative)
+            else if (instructions[n].type == "s") {		// shorthand/smooth curveto (relative)
                 var obj = {};
-                obj.instruction = "bezierCurveTo";
+                obj.type = "bezierCurveTo";
                 obj.args = [lastX, lastY, instructions[n].args[0] + lastX, instructions[n].args[1] + lastY, instructions[n].args[2] + lastX, instructions[n].args[3] + lastY];
                 objs.push(obj);
                 lastX += instructions[n].args[2];
                 lastY += instructions[n].args[3];
             }
-            else if (instructions[n].instruction == "Q") {		// quadratic Bezier curveto (absolute)
+            else if (instructions[n].type == "Q") {		// quadratic Bezier curveto (absolute)
                 var obj = {};
-                obj.instruction = "quadraticCurveTo";
+                obj.type = "quadraticCurveTo";
                 obj.args = [instructions[n].args[0], instructions[n].args[1], instructions[n].args[2], instructions[n].args[3]];
                 objs.push(obj);
                 lastX = instructions[n].args[2];
                 lastY = instructions[n].args[3];
             }
-            else if (instructions[n].instruction == "q") {		// quadratic Bezier curveto (relative)
+            else if (instructions[n].type == "q") {		// quadratic Bezier curveto (relative)
                 var obj = {};
-                obj.instruction = "quadraticCurveTo";
+                obj.type = "quadraticCurveTo";
                 obj.args = [instructions[n].args[0] + lastX, instructions[n].args[1] + lastY, instructions[n].args[2] + lastX, instructions[n].args[3] + lastY];
                 objs.push(obj);
                 lastX += instructions[n].args[2];
                 lastY += instructions[n].args[3];
             }
-            else if (instructions[n].instruction == "T") {		// shorthand/smooth quadratic Bezier curveto (absolute)
+            else if (instructions[n].type == "T") {		// shorthand/smooth quadratic Bezier curveto (absolute)
                 var obj = {};
-                obj.instruction = "quadraticCurveTo";
+                obj.type = "quadraticCurveTo";
                 obj.args = [lastX, lastY, instructions[n].args[0], instructions[n].args[1]];
                 objs.push(obj);
                 lastX = instructions[n].args[0];
                 lastY = instructions[n].args[1];
             }
-            else if (instructions[n].instruction == "t") {		// shorthand/smooth quadratic Bezier curveto (relative)
+            else if (instructions[n].type == "t") {		// shorthand/smooth quadratic Bezier curveto (relative)
                 var obj = {};
-                obj.instruction = "quadraticCurveTo";
+                obj.type = "quadraticCurveTo";
                 obj.args = [lastX, lastY, instructions[n].args[0] + lastX, instructions[n].args[1] + lastY];
                 objs.push(obj);
                 lastX += instructions[n].args[0];
                 lastY += instructions[n].args[1];
             }
-            else if (instructions[n].instruction == "A") {		// elliptical arc (absolute), NOT THE SAME AS THE SVG COMMAND
+            else if (instructions[n].type == "A") {		// elliptical arc (absolute), NOT THE SAME AS THE SVG COMMAND
                 var obj = {};
-                obj.instruction = "arcTo";
+                obj.type = "arcTo";
                 obj.args = [instructions[n].args[0], instructions[n].args[1], instructions[n].args[2], instructions[n].args[3], instructions[n].args[4]];
                 objs.push(obj);
                 lastX = instructions[n].args[2];
                 lastY = instructions[n].args[3];
             }
-            else if (instructions[n].instruction == "a") {		// elliptical arc (relative), NOT THE SAME AS THE SVG COMMAND
+            else if (instructions[n].type == "a") {		// elliptical arc (relative), NOT THE SAME AS THE SVG COMMAND
                 var obj = {};
-                obj.instruction = "arcTo";
+                obj.type = "arcTo";
                 obj.args = [instructions[n].args[0] + lastX, instructions[n].args[1] + lastY, instructions[n].args[2] + lastX, instructions[n].args[3] + lastY, instructions[n].args[4]];
                 objs.push(obj);
                 lastX += instructions[n].args[2];
@@ -857,20 +857,25 @@
             var renderedObjects = ZUI.activeView.renderedObjects;
             var renderedObject = null;
             for (var n = 0; n < renderedObjects.length; n++) {
-                if (renderedObjects[n].pointHitTest(x, y)) {
+                var hasEventListeners = false;
+                for (var foo in renderedObjects[n].eventListeners) {
+                    hasEventListeners = true;
+                    break;
+                }
+                if (hasEventListeners && renderedObjects[n].pointHitTest(x, y)) {
                     renderedObject = renderedObjects[n];
                 }
             }
             for (n = 0; n < renderedObjects.length; n++) {
                 if (renderedObjects[n] != renderedObject && renderedObjects[n]._private.isHovered) {
                     renderedObjects[n]._private.isHovered = false;
-                    renderedObjects[n].mouseOut();
+                    renderedObjects[n].eventListeners.mouseOut();
                 }
             }
             if (renderedObject) {
-                if (!renderedObject._private.isHovered) {
+                if (renderedObject.eventListeners.mouseOver && !renderedObject._private.isHovered) {
                     renderedObject._private.isHovered = true;
-                    renderedObject.mouseOver();
+                    renderedObject.eventListeners.mouseOver();
                 }
             }
         }
@@ -890,7 +895,12 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = renderedObjects.length - 1; n >= 0; n--) {
-            if (renderedObjects[n].pointHitTest(x, y)) {
+            var hasEventListeners = false;
+            for (var foo in renderedObjects[n].eventListeners) {
+                hasEventListeners = true;
+                break;
+            }
+            if (hasEventListeners && renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
                 break;
             }
@@ -899,17 +909,23 @@
         if (event.button == 0) {
             ZUI.mouseStatus.leftDown = true;
             ZUI.activeView.leftMouseDown();
-            if (renderedObject) renderedObject.leftMouseDown();
+            if (renderedObject && renderedObject.eventListeners.leftMouseDown) {
+                renderedObject.eventListeners.leftMouseDown();
+            }
         }
         else if (event.button == 1) {
             ZUI.mouseStatus.middleDown = true;
             ZUI.activeView.middleMouseDown();
-            if (renderedObject) renderedObject.middleMouseDown();
+            if (renderedObject && renderedObject.eventListeners.middleMouseDown) {
+                renderedObject.eventListeners.middleMouseDown();
+            }
         }
         else if (event.button == 2) {
             ZUI.mouseStatus.rightDown = true;
             ZUI.activeView.rightMouseDown();
-            if (renderedObject) renderedObject.rightMouseDown();
+            if (renderedObject && renderedObject.eventListeners.rightMouseDown) {
+                renderedObject.eventListeners.rightMouseDown();
+            }
         }
         if (ZUI.passInputEvent) {
             ZUI.passInputEvent(event);
@@ -923,7 +939,12 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = renderedObjects.length - 1; n >= 0; n--) {
-            if (renderedObjects[n].pointHitTest(x, y)) {
+            var hasEventListeners = false;
+            for (var foo in renderedObjects[n].eventListeners) {
+                hasEventListeners = true;
+                break;
+            }
+            if (hasEventListeners && renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
                 break;
             }
@@ -932,17 +953,23 @@
         if (event.button == 0) {
             ZUI.mouseStatus.leftDown = false;
             ZUI.activeView.leftMouseUp();
-            if (renderedObject) renderedObject.leftMouseUp();
+            if (renderedObject && renderedObject.eventListeners.leftMouseUp) {
+                renderedObject.eventListeners.leftMouseUp();
+            }
         }
         else if (event.button == 1) {
             ZUI.mouseStatus.middleDown = false;
             ZUI.activeView.middleMouseUp();
-            if (renderedObject) renderedObject.middleMouseUp();
+            if (renderedObject && renderedObject.eventListeners.middleMouseUp) {
+                renderedObject.eventListeners.middleMouseUp();
+            }
         }
         else if (event.button == 2) {
             ZUI.mouseStatus.rightDown = false;
             ZUI.activeView.rightMouseUp();
-            if (renderedObject) renderedObject.rightMouseUp();
+            if (renderedObject && renderedObject.eventListeners.rightMouseUp) {
+                renderedObject.eventListeners.rightMouseUp();
+            }
         }
         if (ZUI.passInputEvent) {
             ZUI.passInputEvent(event);
@@ -962,23 +989,30 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = 0; n < renderedObjects.length; n++) {
-            if (renderedObjects[n].pointHitTest(x, y)) {
+            var hasEventListeners = false;
+            for (var foo in renderedObjects[n].eventListeners) {
+                hasEventListeners = true;
+                break;
+            }
+            if (hasEventListeners && renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
             }
         }
 
         ZUI.activeView.mouseMove();
         for (n = 0; n < renderedObjects.length; n++) {
-            if (renderedObjects[n] != renderedObject && renderedObjects[n].isHovered) {
-                renderedObjects[n].isHovered = false;
-                renderedObjects[n].mouseOut();
+            if (renderedObjects[n] != renderedObject && renderedObjects[n]._private.isHovered) {
+                renderedObjects[n]._private.isHovered = false;
+                renderedObjects[n].eventListeners.mouseOut();
             }
         }
         if (renderedObject) {
-            renderedObject.mouseMove();
-            if (!renderedObject.isHovered) {
-                renderedObject.isHovered = true;
-                renderedObject.mouseOver();
+            if (renderedObject.eventListeners.mouseMove) {
+                renderedObject.eventListeners.mouseMove();
+            }
+            if (renderedObject.eventListeners.mouseOver && !renderedObject._private.isHovered) {
+                renderedObject._private.isHovered = true;
+                renderedObject.eventListeners.mouseOver();
             }
         }
 
@@ -994,7 +1028,12 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = renderedObjects.length - 1; n >= 0; n--) {
-            if (renderedObjects[n].pointHitTest(x, y)) {
+            var hasEventListeners = false;
+            for (var foo in renderedObjects[n].eventListeners) {
+                hasEventListeners = true;
+                break;
+            }
+            if (hasEventListeners && renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
                 break;
             }
@@ -1005,15 +1044,21 @@
                 ZUI.customContextMenu.close();
             }
             ZUI.activeView.leftClick();
-            if (renderedObject) renderedObject.leftClick();
+            if (renderedObject && renderedObject.eventListeners.leftClick) {
+                renderedObject.eventListeners.leftClick();
+            }
         }
         else if (event.button == 1) {
             ZUI.activeView.middleClick();
-            if (renderedObject) renderedObject.middleClick();
+            if (renderedObject && renderedObject.eventListeners.middleClick) {
+                renderedObject.eventListeners.middleClick();
+            }
         }
         else if (event.button == 2) {
             ZUI.activeView.rightClick();
-            if (renderedObject) renderedObject.rightClick();
+            if (renderedObject && renderedObject.eventListeners.rightClick) {
+                renderedObject.eventListeners.rightClick();
+            }
         }
         if (ZUI.passInputEvent) {
             ZUI.passInputEvent(event);
@@ -1027,7 +1072,12 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = renderedObjects.length - 1; n >= 0; n--) {
-            if (renderedObjects[n].pointHitTest(x, y)) {
+            var hasEventListeners = false;
+            for (var foo in renderedObjects[n].eventListeners) {
+                hasEventListeners = true;
+                break;
+            }
+            if (hasEventListeners && renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
                 break;
             }
@@ -1035,11 +1085,15 @@
 
         if (event.button == 0) {
             ZUI.activeView.leftDoubleClick();
-            if (renderedObject) renderedObject.leftDoubleClick();
+            if (renderedObject && renderedObject.eventListeners.leftDoubleClick) {
+                renderedObject.eventListeners.leftDoubleClick();
+            }
         }
         else if (event.button == 1) {
             ZUI.activeView.middleDoubleClick();
-            if (renderedObject) renderedObject.middleDoubleClick();
+            if (renderedObject && renderedObject.eventListeners.middleDoubleClick) {
+                renderedObject.eventListeners.middleDoubleClick();
+            }
         }
         if (ZUI.passInputEvent) {
             ZUI.passInputEvent(event);
@@ -1056,14 +1110,21 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = renderedObjects.length - 1; n >= 0; n--) {
-            if (renderedObjects[n].pointHitTest(x, y)) {
+            var hasEventListeners = false;
+            for (var foo in renderedObjects[n].eventListeners) {
+                hasEventListeners = true;
+                break;
+            }
+            if (hasEventListeners && renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
                 break;
             }
         }
 
         ZUI.activeView.mouseWheel(scroll);
-        if (renderedObject) renderedObject.mouseWheel(scroll);
+        if (renderedObject && renderedObject.eventListeners.mouseWheel) {
+            renderedObject.eventListeners.mouseWheel(scroll);
+        }
         if (ZUI.passInputEvent) {
             ZUI.passInputEvent(event);
         }
@@ -1076,14 +1137,21 @@
         var renderedObjects = ZUI.activeView.renderedObjects;
         var renderedObject = null;
         for (var n = renderedObjects.length - 1; n >= 0; n--) {
-            if (renderedObjects[n].pointHitTest(x, y)) {
+            var hasEventListeners = false;
+            for (var foo in renderedObjects[n].eventListeners) {
+                hasEventListeners = true;
+                break;
+            }
+            if (hasEventListeners && renderedObjects[n].pointHitTest(x, y)) {
                 renderedObject = renderedObjects[n];
                 break;
             }
         }
 
         ZUI.activeView.contextMenu();
-        if (renderedObject) renderedObject.contextMenu();
+        if (renderedObject && renderedObject.eventListeners.contextMenu) {
+            renderedObject.eventListeners.contextMenu();
+        }
         if (ZUI.passInputEvent) {
             ZUI.passInputEvent(event);
         }
@@ -1286,7 +1354,7 @@
         this.data = (attributes.data === undefined) ? null : attributes.data;
         if (this.type == "zoom") {
             this.bezier = (attributes.bezier === undefined) ? [0.25, 0.1, 0.25, 1] : attributes.bezier;
-            this.spline = new ZUI.Util.KeySpline(this.bezier[0], this.bezier[1], this.bezier[2], this.bezier[3]);
+            this.spline = new ZUI.Helper.KeySpline(this.bezier[0], this.bezier[1], this.bezier[2], this.bezier[3]);
             this.sourceX = (attributes.sourceX === undefined) ? undefined : attributes.sourceX;
             this.sourceY = (attributes.sourceY === undefined) ? undefined : attributes.sourceY;
             this.sourceDistance = (attributes.sourceDistance === undefined) ? undefined : attributes.sourceDistance;
@@ -1301,7 +1369,7 @@
         if (this.view) {
             this.view.animation = this;
         }
-        this.startTime = ZUI.Util.getTime();
+        this.startTime = ZUI.Helper.getTime();
         this.remainingTime = this.duration;
         if (this.type == "zoom") {
             if (this.sourceX === undefined) this.sourceX = ZUI.camera._x;
@@ -1332,7 +1400,7 @@
 
     // draw
     ZUI.Animation.prototype.draw = function() {
-        var currentTime = ZUI.Util.getTime();
+        var currentTime = ZUI.Helper.getTime();
         this.elapsedTime = currentTime - this.startTime;
         this.remainingTime = this.duration - this.elapsedTime;
         if (this.remainingTime > 0) {
@@ -1676,6 +1744,7 @@
         //   fillColor
         //   alpha
         //   centerAt {horizontal, vertical}
+        //   eventListeners
         (function () {
             // define default properties
             var defaultProperties = {
@@ -1703,7 +1772,8 @@
                 centerAt: {
                     horizontal: ZUI.Def.Left,
                     vertical: ZUI.Def.Top
-                }
+                },
+                eventListeners: []
             };
 
             // assign default to undefined properties
@@ -1751,7 +1821,7 @@
 
     // point hit test
     ZUI.RenderedObject.Base.prototype.pointHitTest = function (x, y) {
-        this._private.context.isPointInPath(x, y);
+        return this._private.context.isPointInPath(x, y);
     };
 
     // render (abstract)
@@ -2070,7 +2140,7 @@
         }
 
         // get adjusted position
-        // scaleAt property does not apply for line paths
+        // centerAt property does not apply for line paths
 
         // set up context
         this._private.context.save();
@@ -2089,7 +2159,122 @@
         for (var n = 1; n < this.renderedVertices.length; n++) {
             this._private.context.lineTo(this.renderedVertices[n].x, this.renderedVertices[n].y);
         }
-        //this._private.context.closePath();
+        this._private.context.restore();
+        if (this.stroke) {
+            this._private.context.stroke();
+        }
+        if (this.fill) {
+            this._private.context.fill();
+        }
+
+        // restore context
+        this._private.context.restore();
+    };
+
+})();
+
+
+(function() {
+
+    // constructor
+    ZUI.RenderedObject.Shape = function(properties) {
+        // call base constructor
+        ZUI.RenderedObject.Base.call(this, properties);
+
+        // private properties
+        this._private.paths = [];
+
+        // save scope for access by child scopes
+        var that = this;
+
+        // assign default to undefined properties
+        //   paths
+        (function () {
+            // define default properties
+            var defaultProperties = {
+                paths: [],
+                scale: ZUI.Def.WorldScale
+            };
+
+            // assign default to undefined properties
+            for (var propertyName in defaultProperties) {
+                ZUI.Helper.assignDefaultProperty(propertyName, that, defaultProperties[propertyName]);
+            }
+        })();
+
+        // parse paths
+        for (var n = 0; n < this.paths.length; n++) {
+            var path = {};
+            path.instructions = ZUI.Helper.parseSVGPath(this.paths[n]);
+            this._private.paths.push(path);
+        }
+
+        // set ready flag
+        this._private.isReady = true;
+    };
+
+    // inherit base prototype
+    ZUI.Helper.inheritClass(ZUI.RenderedObject.Base, ZUI.RenderedObject.Shape);
+
+    // render
+    ZUI.RenderedObject.Shape.prototype.render = function () {
+        // call base method
+        ZUI.RenderedObject.Base.prototype.render.call(this);
+
+        // get rendered paths
+        this._private.renderedPaths = [];
+        for (var n = 0; n < this._private.paths.length; n++) {
+            var path = this._private.paths[n];
+            var renderedPath = {
+                instructions: []
+            };
+            for (var m = 0; m < path.instructions.length; m++) {
+                var instruction = path.instructions[m];
+                var renderedInstruction = {
+                    type: instruction.type,
+                    args: []
+                };
+                var type = instruction.type;
+                var args = instruction.args;
+                for (var i = 0; i < args.length; i++) {
+                    renderedInstruction.args.push(args[i]);
+                }
+                for (var i = 0; i + 1 < args.length; i += 2) {
+                    var renderedPoint = ZUI.Helper.interpretScale({
+                        x: renderedInstruction.args[i],
+                        y: renderedInstruction.args[i + 1]
+                    }, this.scale);
+                    renderedInstruction.args[i] = renderedPoint.x;
+                    renderedInstruction.args[i + 1] = renderedPoint.y;
+                }
+                renderedPath.instructions.push(renderedInstruction);
+            }
+            this._private.renderedPaths.push(renderedPath);
+        }
+
+        // get adjusted position
+        var adjustedPosition = ZUI.Helper.interpretCenterAt(this.renderedPosition, this.renderedPositionOffset, 0, 0, this.centerAt);
+
+        // set up context
+        this._private.context.save();
+        this._private.context.strokeStyle = this.strokeColor;
+        this._private.context.fillStyle = this.fillColor;
+        this._private.context.globalAlpha = this.alpha;
+        this._private.context.lineWidth = this.renderedStrokeThickness;
+
+        // render
+        this._private.context.save();
+        this._private.context.translate(adjustedPosition.x, adjustedPosition.y);
+        this._private.context.scale(this.hStretch, this.vStretch);
+        this._private.context.rotate(this.rotate);
+        this._private.context.beginPath();
+        for (var n = 0; n < this._private.renderedPaths.length; n++) {
+            var renderedPath = this._private.renderedPaths[n];
+            for (var m = 0; m < renderedPath.instructions.length; m++) {
+                var instruction = renderedPath.instructions[m];
+                this._private.context[instruction.type].apply(this._private.context, instruction.args);
+            }
+        }
         this._private.context.restore();
         if (this.stroke) {
             this._private.context.stroke();
@@ -2107,5 +2292,92 @@
 
 
 
+(function() {
 
+    // constructor
+    ZUI.RenderedObject.Image = function(properties) {
+        // call base constructor
+        ZUI.RenderedObject.Base.call(this, properties);
 
+        // private properties
+        this._private.image = new Image();
+
+        // save scope for access by child scopes
+        var that = this;
+
+        // assign default to undefined properties
+        //   width
+        //   height
+        //   url
+        //   data
+        //   type
+        (function () {
+            // define default properties
+            var defaultProperties = {
+                width: 0,
+                widthScale: ZUI.Def.WorldScale,
+                height: 0,
+                heightScale: ZUI.Def.WorldScale,
+                url: '',
+                data: null,
+                type: 'png'
+            };
+
+            // assign default to undefined properties
+            for (var propertyName in defaultProperties) {
+                ZUI.Helper.assignDefaultProperty(propertyName, that, defaultProperties[propertyName]);
+            }
+        })();
+
+        // load image
+        this._private.image.onload = (function() {
+            this._private.isReady = true;
+        }).bind(this);
+        if (!this.data) {
+            this._private.image.src = this.url;
+        }
+        else {
+            this._private.image.src = 'data:image/' + this.type + ';base64,' + this.data;
+        }
+    };
+
+    // inherit base prototype
+    ZUI.Helper.inheritClass(ZUI.RenderedObject.Base, ZUI.RenderedObject.Image);
+
+    // render
+    ZUI.RenderedObject.Image.prototype.render = function () {
+        // call base method
+        ZUI.RenderedObject.Base.prototype.render.call(this);
+
+        // get rendered size
+        this.renderedWidth = ZUI.Helper.interpretScale(this.width, this.widthScale);
+        this.renderedHeight = ZUI.Helper.interpretScale(this.height, this.heightScale);
+
+        // get adjusted position
+        var adjustedPosition = ZUI.Helper.interpretCenterAt({
+            x: this.renderedPosition.x + this.renderedRadius,
+            y: this.renderedPosition.y + this.renderedRadius
+        }, this.renderedPositionOffset, this.renderedRadius * 2, this.renderedRadius * 2, this.centerAt);
+
+        // set up context
+        this._private.context.save();
+
+        // render
+        this._private.context.save();
+        this._private.context.translate(adjustedPosition.x, adjustedPosition.y);
+        this._private.context.scale(this.hStretch, this.vStretch);
+        this._private.context.rotate(this.rotate);
+        this._private.context.drawImage(this._private.image, 0, 0, this.renderedWidth, this.renderedHeight);
+        this._private.context.beginPath();
+        this._private.context.moveTo(0, 0);
+        this._private.context.lineTo(this.renderedWidth, 0);
+        this._private.context.lineTo(this.renderedWidth, this.renderedHeight);
+        this._private.context.lineTo(0, this.renderedHeight);
+        this._private.context.closePath();
+        this._private.context.restore();
+
+        // restore context
+        this._private.context.restore();
+    };
+
+})();

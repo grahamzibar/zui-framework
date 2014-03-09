@@ -31,7 +31,7 @@ module.exports = function(grunt) {
                     'scripts/rendered-object/circle.js',
                     'scripts/rendered-object/text.js',
                     'scripts/rendered-object/line-path.js',
-                    'scripts/rendered-object/path.js',
+                    'scripts/rendered-object/shape.js',
                     'scripts/rendered-object/svg.js',
                     'scripts/rendered-object/image.js'
                 ],

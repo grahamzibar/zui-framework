@@ -42,6 +42,7 @@
         //   fillColor
         //   alpha
         //   centerAt {horizontal, vertical}
+        //   eventListeners
         (function () {
             // define default properties
             var defaultProperties = {
@@ -69,7 +70,8 @@
                 centerAt: {
                     horizontal: ZUI.Def.Left,
                     vertical: ZUI.Def.Top
-                }
+                },
+                eventListeners: []
             };
 
             // assign default to undefined properties
@@ -117,7 +119,7 @@
 
     // point hit test
     ZUI.RenderedObject.Base.prototype.pointHitTest = function (x, y) {
-        this._private.context.isPointInPath(x, y);
+        return this._private.context.isPointInPath(x, y);
     };
 
     // render (abstract)

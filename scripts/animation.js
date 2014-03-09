@@ -11,7 +11,7 @@
         this.data = (attributes.data === undefined) ? null : attributes.data;
         if (this.type == "zoom") {
             this.bezier = (attributes.bezier === undefined) ? [0.25, 0.1, 0.25, 1] : attributes.bezier;
-            this.spline = new ZUI.Util.KeySpline(this.bezier[0], this.bezier[1], this.bezier[2], this.bezier[3]);
+            this.spline = new ZUI.Helper.KeySpline(this.bezier[0], this.bezier[1], this.bezier[2], this.bezier[3]);
             this.sourceX = (attributes.sourceX === undefined) ? undefined : attributes.sourceX;
             this.sourceY = (attributes.sourceY === undefined) ? undefined : attributes.sourceY;
             this.sourceDistance = (attributes.sourceDistance === undefined) ? undefined : attributes.sourceDistance;
@@ -26,7 +26,7 @@
         if (this.view) {
             this.view.animation = this;
         }
-        this.startTime = ZUI.Util.getTime();
+        this.startTime = ZUI.Helper.getTime();
         this.remainingTime = this.duration;
         if (this.type == "zoom") {
             if (this.sourceX === undefined) this.sourceX = ZUI.camera._x;
@@ -57,7 +57,7 @@
 
     // draw
     ZUI.Animation.prototype.draw = function() {
-        var currentTime = ZUI.Util.getTime();
+        var currentTime = ZUI.Helper.getTime();
         this.elapsedTime = currentTime - this.startTime;
         this.remainingTime = this.duration - this.elapsedTime;
         if (this.remainingTime > 0) {

@@ -41,6 +41,27 @@
         });
         this.border.attachToView(this);
 
+var shape = new ZUI.RenderedObject.Shape({
+    position: {
+        x: 0,
+        y: 0
+    },
+    positionScale: ZUI.Def.ScreenScale,
+    paths: [
+        "M0 0 L-75 200 L75 200 Q10 20 100 100 Z"
+    ],
+    eventListeners: {
+        mouseOver: function() {
+            console.log('mouse over');
+        },
+        mouseOut: function() {
+            console.log('mouse out');
+        }
+    }
+});
+shape.attachToView(this);
+console.log(shape);
+
         /* Array to keep track of all the lines drawn */
         this.lines = [];
     }
