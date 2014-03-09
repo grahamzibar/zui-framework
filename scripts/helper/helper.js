@@ -69,7 +69,7 @@
         }
         else if (scale === ZUI.Def.WorldScale) {
             // point
-            if (isNaN(Number(value))) {
+            if (isNaN(value)) {
                 return ZUI.camera.projectPoint(value);
             }
 
@@ -85,19 +85,19 @@
 
     // interpret the centerAt option and returns the updated position
     ZUI.Helper.interpretCenterAt = function(position, positionOffset, width, height, centerAt) {
-        var adustedPosition = {
+        var adjustedPosition = {
             x: position.x + positionOffset.x,
             y: position.y + positionOffset.y
         }
 
         if (centerAt.horizontal === ZUI.Def.Left) {
-            adustedPosition.x -= 0;
+            adjustedPosition.x -= 0;
         }
         else if (centerAt.horizontal === ZUI.Def.Center) {
-            adustedPosition.x -= width / 2;
+            adjustedPosition.x -= width / 2;
         }
         else if (centerAt.horizontal === ZUI.Def.Right) {
-            adustedPosition.x -= width;
+            adjustedPosition.x -= width;
         }
         else {
             throw {
@@ -107,13 +107,13 @@
         }
 
         if (centerAt.vertical === ZUI.Def.Top) {
-            adustedPosition.y -= 0;
+            adjustedPosition.y -= 0;
         }
         else if (centerAt.vertical === ZUI.Def.Center) {
-            adustedPosition.y -= height / 2;
+            adjustedPosition.y -= height / 2;
         }
         else if (centerAt.vertical === ZUI.Def.Bottom) {
-            adustedPosition.y -= height;
+            adjustedPosition.y -= height;
         }
         else {
             throw {
@@ -122,7 +122,7 @@
             };
         }
 
-        return adustedPosition;
+        return adjustedPosition;
     };
 
     // check whether a color string is valid

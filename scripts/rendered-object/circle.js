@@ -60,8 +60,8 @@
 
         // get adjusted position
         var adjustedPosition = ZUI.Helper.interpretCenterAt({
-            x: this.renderedPosition.x - this.renderedRadius,
-            y: this.renderedPosition.y - this.renderedRadius
+            x: this.renderedPosition.x + this.renderedRadius,
+            y: this.renderedPosition.y + this.renderedRadius
         }, this.renderedPositionOffset, this.renderedRadius * 2, this.renderedRadius * 2, this.centerAt);
 
         // set up context
