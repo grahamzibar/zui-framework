@@ -13,7 +13,9 @@
 
         // assign default to undefined properties
         //   width
+        //   widthScale
         //   height
+        //   heightScale
         //   url
         //   data
         //   type
@@ -60,10 +62,7 @@
         this.renderedHeight = ZUI.Helper.interpretScale(this.height, this.heightScale);
 
         // get adjusted position
-        var adjustedPosition = ZUI.Helper.interpretCenterAt({
-            x: this.renderedPosition.x + this.renderedRadius,
-            y: this.renderedPosition.y + this.renderedRadius
-        }, this.renderedPositionOffset, this.renderedRadius * 2, this.renderedRadius * 2, this.centerAt);
+        var adjustedPosition = ZUI.Helper.interpretCenterAt(this.renderedPosition, this.renderedPositionOffset, this.renderedWidth, this.renderedHeight, this.centerAt);
 
         // set up context
         this._private.context.save();

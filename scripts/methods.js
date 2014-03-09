@@ -116,7 +116,7 @@
 
             // render rendered objects if needed
             for (var n = 0; n < ZUI.activeView.renderedObjects.length; n++) {
-                if (ZUI.activeView.renderedObjects[n].isUpdated) {
+                if (ZUI.activeView.renderedObjects[n].isReady && ZUI.activeView.renderedObjects[n].isUpdated) {
                     ZUI.activeView.renderedObjects[n].render();
                     ZUI.activeView.renderedObjects[n].isUpdated = false;
                 }
@@ -137,7 +137,9 @@
 
                 // draw active view's rendered objects
                 for (var n = 0; n < ZUI.activeView.renderedObjects.length; n++) {
-                    ZUI.activeView.renderedObjects[n].draw();
+                    if (ZUI.activeView.renderedObjects[n].isReady) {
+                        ZUI.activeView.renderedObjects[n].draw();
+                    }
                 }
             }
 
