@@ -21,4 +21,6 @@
 
     ZUI.eventListeners = null;
 
+    ZUI.passInputEvent = null;
+
 })();

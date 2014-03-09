@@ -64,6 +64,9 @@
             return false;
         };
 
+        // initialize ZUI event listeners hash
+        ZUI.eventListeners = new ZUI.Hash();
+
         // set first view
         ZUI.activeView = new ZUI.View();
         ZUI.activeView.active();
@@ -258,7 +261,7 @@
         }
     };
 
-    /* Click event callback */
+    // click event callback
     ZUI.click = function(event) {
         var x = ZUI.mouseStatus.x;
         var y = ZUI.mouseStatus.y;
@@ -360,7 +363,108 @@
         }
     };
 
-    // per-frame update with customized logic (need override)
+    // fires a ZUI event */
+    ZUI.fireEvent = function(event) {
+        // filter event listeners by type
+        var eventListeners1 = ZUI.eventListeners.get(event.type);
+        if (!eventListeners1) {
+            return;
+        }
+
+        // filter event listeners by target
+        var eventListeners2 = eventListeners1.get(event.target);
+        if (eventListeners2) {
+            // execute callback functions
+            for (var n = 0; n < eventListeners2.length; n++) {
+                eventListeners2[n].callback(event, event.data, eventListeners2[n].data);
+            }
+        }
+
+        // execute callback functions with no particular target
+        var eventListeners3 = eventListeners1.get("_all");
+        if (eventListeners3) {
+            for (n = 0; n < eventListeners3.length; n++) {
+                eventListeners3[n].callback(event, event.data, eventListeners3[n].data);
+            }
+        }
+    };
+
+    // adds a ZUI event listener
+    ZUI.addEventListener = function(eventListener) {
+        // filter event listeners by type
+        var eventListeners1 = ZUI.eventListeners.get(eventListener.type);
+        if (!eventListeners1) {
+            eventListeners1 = new ZUI.Hash();
+            ZUI.eventListeners.put(eventListener.type, eventListeners1);
+        }
+
+        // filter event listeners by target
+        var target = eventListener.target;
+        if (target === undefined || target === null) {
+            target = "_all";
+        }
+        var eventListeners2 = eventListeners1.get(target);
+        if (!eventListeners2) {
+            eventListeners2 = [];
+            eventListeners1.put(target, eventListeners2);
+        }
+
+        // add event listener
+        eventListeners2.push(eventListener);
+    };
+
+    // removes a ZUI event listener
+    ZUI.removeEventListener = function(eventListener) {
+        // filter event listeners by type
+        var eventListeners1 = ZUI.eventListeners.get(eventListener.type);
+        if (!eventListeners1) {
+            return;
+        }
+
+        // filter event listeners by target
+        var target = eventListener.target;
+        if (target === undefined || target === null) {
+            target = "_all";
+        }
+        var eventListeners2 = eventListeners1.get(target);
+        if (!eventListeners2) {
+            return;
+        }
+
+        // remove event listener
+        var index = eventListeners2.indexOf(eventListener);
+        if (index < 0) {
+            return;
+        }
+        eventListeners2.splice(index, 1);
+
+        // remove target level eventListeners if empty
+        if (eventListeners2.length == 0) {
+            eventListeners1.delete(target);
+        }
+
+        // remove type level eventListeners if empty
+        if (eventListeners1.length == 0) {
+            ZUI.eventListeners.delete(eventListener.type);
+        }
+    };
+
+    // removes all ZUI event listeners for the specified target
+    ZUI.removeEventListenersForTarget = function(target) {
+        var keys = ZUI.eventListeners.getKeys();
+        for (var n = 0; n < keys.length; n++) {
+            var key = keys[n];
+            var eventListeners = ZUI.eventListeners.get(key);
+            if (eventListeners.get(target)) {
+                eventListeners.delete(target);
+            }
+            if (!eventListeners.getSize()) {
+                ZUI.eventListeners.delete(key);
+            }
+        }
+    };
+
+    // per-frame update with customized logic (override if needed)
     ZUI.update = function() {};
 
 })();

@@ -2,9 +2,31 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b08611af-97be-40e3-a6a2-552f0540d090" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/scripts/camera/default-camera.js" afterPath="$PROJECT_DIR$/scripts/camera/default-camera.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/scripts/animation.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/scripts/context-menu.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/scripts/event-listener.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/scripts/event.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/scripts/hash.js" />
+      <change type="DELETED" beforePath="C:\codes\zui-framework\scripts\old-code\ZUI.Animation.js" afterPath="" />
+      <change type="DELETED" beforePath="C:\codes\zui-framework\scripts\old-code\ZUI.ContextMenu.js" afterPath="" />
+      <change type="DELETED" beforePath="C:\codes\zui-framework\scripts\old-code\ZUI.ContextMenuOption.js" afterPath="" />
+      <change type="DELETED" beforePath="C:\codes\zui-framework\scripts\old-code\ZUI.Event.js" afterPath="" />
+      <change type="DELETED" beforePath="C:\codes\zui-framework\scripts\old-code\ZUI.EventListener.js" afterPath="" />
+      <change type="DELETED" beforePath="C:\codes\zui-framework\scripts\old-code\ZUI.Geometry.js" afterPath="" />
+      <change type="DELETED" beforePath="C:\codes\zui-framework\scripts\old-code\ZUI.HashMap.js" afterPath="" />
+      <change type="DELETED" beforePath="C:\codes\zui-framework\scripts\old-code\ZUI.Math.js" afterPath="" />
+      <change type="DELETED" beforePath="C:\codes\zui-framework\scripts\old-code\ZUI.Parser.js" afterPath="" />
+      <change type="DELETED" beforePath="C:\codes\zui-framework\scripts\old-code\ZUI.Statistics.js" afterPath="" />
+      <change type="DELETED" beforePath="C:\codes\zui-framework\scripts\old-code\ZUI.Util.KeySpline.js" afterPath="" />
+      <change type="DELETED" beforePath="C:\codes\zui-framework\scripts\old-code\ZUI.Util.js" afterPath="" />
+      <change type="DELETED" beforePath="C:\codes\zui-framework\scripts\old-code\ZUI.View.js" afterPath="" />
+      <change type="DELETED" beforePath="C:\codes\zui-framework\scripts\old-code\ZUI.ViewObject.js" afterPath="" />
+      <change type="DELETED" beforePath="C:\codes\zui-framework\scripts\old-code\ZUI.camera.js" afterPath="" />
+      <change type="DELETED" beforePath="C:\codes\zui-framework\scripts\old-code\ZUI.js" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/scripts/helper/helper.js" afterPath="$PROJECT_DIR$/scripts/helper/helper.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/scripts/methods.js" afterPath="$PROJECT_DIR$/scripts/methods.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/scripts/properties.js" afterPath="$PROJECT_DIR$/scripts/properties.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="zui-framework.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -26,73 +48,19 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="methods.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/scripts/methods.js">
+      <file leaf-file-name="context-menu.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/scripts/context-menu.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="109" column="20" selection-start="3715" selection-end="3715" vertical-scroll-proportion="0.0" vertical-offset="1690" max-vertical-offset="6307">
+            <state line="85" column="0" selection-start="2696" selection-end="2696" vertical-scroll-proportion="0.0" vertical-offset="1054" max-vertical-offset="2499">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="KeySpline.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/scripts/helper/KeySpline.js">
+      <file leaf-file-name="animation.js" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/scripts/animation.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="13" column="14" selection-start="441" selection-end="441" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="901">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="namespace.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/scripts/helper/namespace.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="3" column="20" selection-start="56" selection-end="56" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="187">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ZUI.Statistics.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/scripts/old-code/ZUI.Statistics.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="16" column="0" selection-start="337" selection-end="337" vertical-scroll-proportion="0.0" vertical-offset="173" max-vertical-offset="663">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="base.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/scripts/base.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="2" column="18" selection-start="33" selection-end="33" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1088">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="base.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/scripts/rendered-object/base.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="10" column="29" selection-start="290" selection-end="290" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2142">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="helper.js" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/scripts/helper/helper.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="106" column="6" selection-start="3376" selection-end="3376" vertical-scroll-proportion="3.677551" vertical-offset="0" max-vertical-offset="3536">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ZUI.Util.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/scripts/old-code/ZUI.Util.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="117" column="0" selection-start="3263" selection-end="3263" vertical-scroll-proportion="0.0" vertical-offset="1550" max-vertical-offset="2091">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1411">
               <folding />
             </state>
           </provider>
@@ -132,17 +100,23 @@
         <option value="$PROJECT_DIR$/scripts/rendered-object/circle.js" />
         <option value="$PROJECT_DIR$/scripts/old-code/ZUI.js" />
         <option value="$PROJECT_DIR$/scripts/rendered-object/base.js" />
-        <option value="$PROJECT_DIR$/scripts/properties.js" />
         <option value="$PROJECT_DIR$/scripts/old-code/ZUI.View.js" />
         <option value="$PROJECT_DIR$/scripts/view.js" />
         <option value="$PROJECT_DIR$/scripts/base.js" />
         <option value="$PROJECT_DIR$/.idea/workspace.xml" />
         <option value="$PROJECT_DIR$/scripts/camera/default-camera.js" />
-        <option value="$PROJECT_DIR$/scripts/methods.js" />
         <option value="$PROJECT_DIR$/scripts/helper/KeySpline.js" />
         <option value="$PROJECT_DIR$/scripts/math/namespace.js" />
-        <option value="$PROJECT_DIR$/scripts/helper/helper.js" />
         <option value="$PROJECT_DIR$/scripts/math/math.js" />
+        <option value="$PROJECT_DIR$/context-menu.js" />
+        <option value="$PROJECT_DIR$/scripts/helper/helper.js" />
+        <option value="$PROJECT_DIR$/scripts/event-listener.js" />
+        <option value="$PROJECT_DIR$/scripts/hash.js" />
+        <option value="$PROJECT_DIR$/scripts/properties.js" />
+        <option value="$PROJECT_DIR$/scripts/methods.js" />
+        <option value="$PROJECT_DIR$/scripts/event.js" />
+        <option value="$PROJECT_DIR$/scripts/context-menu.js" />
+        <option value="$PROJECT_DIR$/scripts/animation.js" />
       </list>
     </option>
   </component>
@@ -226,24 +200,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="rendered-object" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="zui-framework" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="zui-framework" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="scripts" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="old-code" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -401,7 +357,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1616" height="876" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32987013" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -410,7 +366,7 @@
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32987013" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32991013" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24967907" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24967907" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24967907" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
@@ -445,15 +401,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="1.9615384" vertical-offset="51" max-vertical-offset="2788">
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/old-code/ZUI.Animation.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1394">
-          <folding>
-            <element signature="n#!!doc" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -499,15 +446,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/old-code/ZUI.ViewObject.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="946" column="28" selection-start="28917" selection-end="28917" vertical-scroll-proportion="235.96" vertical-offset="21981" max-vertical-offset="25534">
-          <folding>
-            <element signature="n#!!doc" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/scripts/rendered-object/line-path.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="490">
@@ -519,24 +457,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state line="82" column="19" selection-start="3124" selection-end="3124" vertical-scroll-proportion="1.8736559" vertical-offset="0" max-vertical-offset="1734">
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/old-code/ZUI.camera.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="177" column="73" selection-start="4883" selection-end="4929" vertical-scroll-proportion="0.5836735" vertical-offset="2723" max-vertical-offset="3213">
-          <folding>
-            <element signature="n#!!doc" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/old-code/ZUI.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="469" column="2" selection-start="12717" selection-end="12717" vertical-scroll-proportion="0.2924731" vertical-offset="7837" max-vertical-offset="10200">
-          <folding>
-            <element signature="n#!!doc" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -554,39 +474,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/old-code/ZUI.View.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="6" column="23" selection-start="102" selection-end="102" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1513">
-          <folding>
-            <element signature="n#!!doc" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/properties.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="1" column="0" selection-start="14" selection-end="14" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="493">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="10642">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/old-code/ZUI.Math.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="14" column="48" selection-start="396" selection-end="396" vertical-scroll-proportion="-1.2897959" vertical-offset="870" max-vertical-offset="1360">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/camera/default-camera.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="88" column="16" selection-start="3137" selection-end="3137" vertical-scroll-proportion="0.0" vertical-offset="1377" max-vertical-offset="2159">
           <folding />
         </state>
       </provider>
@@ -605,20 +495,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/view.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="11" column="19" selection-start="217" selection-end="217" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1360">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/old-code/ZUI.Statistics.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="0" selection-start="337" selection-end="337" vertical-scroll-proportion="0.0" vertical-offset="173" max-vertical-offset="663">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/scripts/rendered-object/base.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="10" column="29" selection-start="290" selection-end="290" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2142">
@@ -626,46 +502,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/base.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="2" column="18" selection-start="33" selection-end="33" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1088">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/methods.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="109" column="20" selection-start="3715" selection-end="3715" vertical-scroll-proportion="0.0" vertical-offset="1690" max-vertical-offset="6307">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/old-code/ZUI.HashMap.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1054">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/old-code/ZUI.Util.KeySpline.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="43" column="1" selection-start="0" selection-end="1422" vertical-scroll-proportion="0.0" vertical-offset="343" max-vertical-offset="833">
-          <folding>
-            <element signature="n#!!doc" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/scripts/helper/KeySpline.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="13" column="14" selection-start="441" selection-end="441" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="901">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/old-code/ZUI.Util.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="117" column="0" selection-start="3263" selection-end="3263" vertical-scroll-proportion="0.0" vertical-offset="1550" max-vertical-offset="2091">
           <folding />
         </state>
       </provider>
@@ -691,9 +530,79 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/camera/default-camera.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="88" column="16" selection-start="3137" selection-end="3137" vertical-scroll-proportion="0.0" vertical-offset="1377" max-vertical-offset="2159">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/scripts/helper/helper.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="106" column="6" selection-start="3376" selection-end="3376" vertical-scroll-proportion="3.677551" vertical-offset="0" max-vertical-offset="3536">
+        <state line="13" column="12" selection-start="391" selection-end="391" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="6494">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/base.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1088">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/view.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="4" column="8" selection-start="70" selection-end="123" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1360">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/properties.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="527">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/methods.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="66" column="46" selection-start="2304" selection-end="2304" vertical-scroll-proportion="0.24285714" vertical-offset="1003" max-vertical-offset="8075">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/hash.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="60" column="5" selection-start="1649" selection-end="1649" vertical-scroll-proportion="0.79183674" vertical-offset="632" max-vertical-offset="1122">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/event-listener.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="14" column="55" selection-start="361" selection-end="361" vertical-scroll-proportion="0.4857143" vertical-offset="0" max-vertical-offset="490">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/event.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="10" column="46" selection-start="272" selection-end="272" vertical-scroll-proportion="0.3469388" vertical-offset="0" max-vertical-offset="490">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/context-menu.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="85" column="0" selection-start="2696" selection-end="2696" vertical-scroll-proportion="0.0" vertical-offset="1054" max-vertical-offset="2499">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/animation.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1411">
           <folding />
         </state>
       </provider>
