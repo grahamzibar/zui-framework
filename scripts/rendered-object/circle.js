@@ -74,11 +74,12 @@
         // render
         this._private.context.save();
         this._private.context.translate(adjustedPosition.x, adjustedPosition.y);
-        this._private.context.scale(this.renderedHRadius, this.renderedVRadius);
+        this._private.context.scale(this.hStretch * this.renderedHRadius, this.vStretch * this.renderedVRadius);
+        this._private.context.rotate(this.rotate);
         this._private.context.beginPath();
         this._private.context.arc(0, 0, 1, 0, 2 * Math.PI);
         this._private.context.closePath();
-        ZUI.context.restore();
+        this._private.context.restore();
         if (this.stroke) {
             this._private.context.stroke();
         }

@@ -101,13 +101,18 @@
         this._private.context.lineWidth = this.renderedStrokeThickness;
 
         // render
+        this._private.context.save();
+        this._private.context.translate(adjustedPosition.x, adjustedPosition.y);
+        this._private.context.scale(this.hStretch, this.vStretch);
+        this._private.context.rotate(this.rotate);
         this._private.context.beginPath();
-        this._private.context.moveTo(adjustedPosition.x + this.renderedLtRadius, adjustedPosition.y);
-        this._private.context.arcTo(adjustedPosition.x + this.renderedWidth, adjustedPosition.y, adjustedPosition.x + this.renderedWidth, adjustedPosition.y + this.renderedHeight, this.renderedRtRadius);
-        this._private.context.arcTo(adjustedPosition.x + this.renderedWidth, adjustedPosition.y + this.renderedHeight, adjustedPosition.x, adjustedPosition.y + this.renderedHeight, this.renderedRbRadius);
-        this._private.context.arcTo(adjustedPosition.x, adjustedPosition.y + this.renderedHeight, adjustedPosition.x, adjustedPosition.y, this.renderedLbRadius);
-        this._private.context.arcTo(adjustedPosition.x, adjustedPosition.y, adjustedPosition.x + this.renderedWidth, adjustedPosition.y, this.renderedLtRadius);
+        this._private.context.moveTo(this.renderedLtRadius, 0);
+        this._private.context.arcTo(this.renderedWidth, 0, this.renderedWidth, this.renderedHeight, this.renderedRtRadius);
+        this._private.context.arcTo(this.renderedWidth, this.renderedHeight, 0, this.renderedHeight, this.renderedRbRadius);
+        this._private.context.arcTo(0, this.renderedHeight, 0, 0, this.renderedLbRadius);
+        this._private.context.arcTo(0, 0, this.renderedWidth, 0, this.renderedLtRadius);
         this._private.context.closePath();
+        this._private.context.restore();
         if (this.stroke) {
             this._private.context.stroke();
         }

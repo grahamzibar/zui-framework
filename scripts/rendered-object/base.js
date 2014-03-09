@@ -31,6 +31,9 @@
         //   positionScale
         //   positionOffset {x, y}
         //   positionOffsetScale
+        //   rotate
+        //   hStretch
+        //   vStretch
         //   stroke
         //   strokeColor
         //   strokeThickness
@@ -53,6 +56,9 @@
                     y: 0
                 },
                 positionOffsetScale: ZUI.Def.ScreenScale,
+                rotate: 0,
+                hStretch: 1,
+                vStretch: 1,
                 stroke: true,
                 strokeColor: "#000000",
                 strokeThickness: 1,

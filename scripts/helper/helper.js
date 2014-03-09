@@ -21,7 +21,7 @@
     // assign default property to an object recursively if the property is undefined
     ZUI.Helper.assignDefaultProperty = function (propertyName, obj, defaultProperty) {
         var hasProperties = false;
-        if ((typeof defaultProperty) !== 'string') {
+        if ((typeof defaultProperty) !== 'string' && !(defaultProperty instanceof Array)) {
             for (var foo in defaultProperty) {
                 hasProperties = true;
                 break;
@@ -35,7 +35,7 @@
                 obj[propertyName] = defaultProperty;
             }
         }
-        if ((typeof defaultProperty) !== 'string') {
+        if ((typeof defaultProperty) !== 'string' && !(defaultProperty instanceof Array)) {
             for (var foo in defaultProperty) {
                 ZUI.Helper.assignDefaultProperty(foo, obj[propertyName], defaultProperty[foo]);
             }
