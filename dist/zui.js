@@ -1,0 +1,1822 @@
+(function() {
+
+    // add namespace
+    window.ZUI = {};
+
+})();
+
+(function() {
+
+    // constructor
+    ZUI.Base = function() {
+        this._private = {};
+    };
+
+    // getter
+    ZUI.Base.prototype.get = function() {
+        var obj = this;
+        var propertyName = arguments[0];
+        if (propertyName === undefined || propertyName === null) {
+            return undefined;
+        }
+
+        var n = 0;
+        while (n < arguments.length - 1) {
+            if (obj === undefined || obj === null) {
+                return undefined;
+            }
+            obj = obj[propertyName];
+            propertyName = arguments[++n];
+            if (propertyName === undefined || propertyName === null) {
+                return undefined;
+            }
+        }
+
+        return obj[propertyName];
+    };
+
+    // setter
+    ZUI.Base.prototype.set = function() {
+        var obj = this;
+        var propertyName = arguments[0];
+        if (propertyName === undefined || propertyName === null) {
+            propertyName = 0;
+        }
+
+        var n = 0;
+        while (n < arguments.length - 2) {
+            if (obj === undefined || obj === null) {
+                obj = {};
+            }
+            obj = obj[propertyName];
+            propertyName = arguments[++n];
+            if (propertyName === undefined || propertyName === null) {
+                propertyName = 0;
+            }
+        }
+        if (obj === undefined || obj === null) {
+            obj = {};
+        }
+
+        this._private.isUpdated = true;
+
+        return obj[propertyName] = arguments[n + 1];
+    };
+
+});
+
+(function() {
+
+    ZUI.Hash = function() {
+        // call base constructor
+        ZUI.Base.call(this);
+
+        this._private.pairs = [];
+    };
+
+    // inherit base
+    ZUI.Helper.inheritClass(ZUI.Base, ZUI.Hash);
+
+    // adds a new key-value pair or sets an existing key's value
+    ZUI.Hash.prototype.put = function(key, value) {
+        for (var n = 0; n < this._private.pairs.length; n++) {
+            if (this._private.pairs[n].key == key) {
+                this._private.pairs[n].value = value;
+                return;
+            }
+        }
+        this._private.pairs.push({
+            key: key,
+            value: value
+        });
+    };
+
+    // gets a key's value
+    ZUI.Hash.prototype.get = function(key) {
+        for (var n = 0; n < this._private.pairs.length; n++) {
+            if (this._private.pairs[n].key == key) {
+                return this._private.pairs[n].value;
+            }
+        }
+        return null;
+    };
+
+    // deletes a key-value pair
+    ZUI.Hash.prototype.delete = function(key) {
+        for (var n = 0; n < this._private.pairs.length; n++) {
+            if (this._private.pairs[n].key == key) {
+                this._private.pairs.splice(n, 1);
+                return;
+            }
+        }
+    };
+
+    // returns a list of keys
+    ZUI.Hash.prototype.getKeys = function() {
+        var keys = [];
+        for (var n = 0; n < this._private.pairs.length; n++) {
+            keys.push(this._private.pairs[n].key);
+        }
+        return keys;
+    };
+
+    // returns the number of key:value pairs
+    ZUI.Hash.prototype.getSize = function() {
+        return this._private.pairs.length;
+    };
+
+})();
+
+(function() {
+
+    // constructor
+    ZUI.Event = function(type, target, data) {
+        // call base constructor
+        ZUI.Base.call(this);
+
+        this.type = type;
+        this.target = target;
+        this.data = data;
+        this.timeStamp = ZUI.Helper.getTime();
+    };
+
+    // inherit base
+    ZUI.Helper.inheritClass(ZUI.Base, ZUI.Event);
+
+})();
+
+(function() {
+
+    // constructor
+    ZUI.EventListener = function(type, target, callback, data) {
+        // call base constructor
+        ZUI.Base.call(this);
+
+        this.type = type;
+        this.target = target;
+        this.callback = callback;
+        this.data = data;
+    };
+
+    // inherit base
+    ZUI.Helper.inheritClass(ZUI.Base, ZUI.EventListener);
+
+})();
+
+(function() {
+
+    ZUI.width = null;
+    ZUI.height = null;
+    ZUI.background = null;
+
+    ZUI.container = null;
+    ZUI.canvas = null;
+    ZUI.context = null;
+
+    ZUI.camera = null;
+    ZUI.frameRate = null;
+    ZUI.lastTimeStamp = null;
+
+    ZUI.activeView = null;
+
+    ZUI.contextMenu = null;
+
+    ZUI.appStatus = null;
+    ZUI.mouseStatus = null;
+
+    ZUI.eventListeners = null;
+
+    ZUI.passInputEvent = null;
+
+})();
+
+(function() {
+
+    // initialize ZUI
+    ZUI.initialize = function (properties) {
+        // transfer properties to this object
+        for (var propertyName in properties) {
+            ZUI[propertyName] = properties[propertyName];
+        }
+
+        // assign default to undefined properties
+        //   width
+        //   height
+        //   background
+        //   frameRate
+        (function () {
+            // define default properties
+            var defaultProperties = {
+                width: 900,
+                height: 600,
+                background: '#FFFFFF',
+                backgroundAlpha: 0,
+                frameRate: 30,
+                cameraFollowRate: 1
+            };
+
+            // assign default to undefined properties
+            for (var propertyName in defaultProperties) {
+                ZUI.Helper.assignDefaultProperty(propertyName, ZUI, defaultProperties[propertyName]);
+            }
+        })();
+
+        // initialize properties that cannot be defined by the user
+        if (properties.canvas) {
+            ZUI.container = properties.canvas.parentNode;
+            ZUI.canvas = properties.canvas;
+            ZUI.context = ZUI.canvas.getContext('2d');
+        }
+
+        // create and set camera
+        ZUI.camera = new ZUI.Camera.DefaultCamera({});
+
+        // create and set context menu
+        ZUI.contextMenu = new ZUI.ContextMenu();
+
+        // set canvas size
+        ZUI.canvas.width = ZUI.width;
+        ZUI.canvas.height = ZUI.height;
+
+        // set cursor
+        ZUI.canvas.style.cursor = "default";
+
+        // add event listeners
+        ZUI.canvas.addEventListener("mousedown", ZUI.mouseDown, false);
+        document.addEventListener("mouseup", ZUI.mouseUp, false);
+        ZUI.canvas.addEventListener("mousemove", ZUI.mouseMove, false);
+        ZUI.canvas.addEventListener("click", ZUI.click, false);
+        ZUI.canvas.addEventListener("dblclick", ZUI.doubleClick, false);
+        ZUI.canvas.addEventListener("mousewheel", ZUI.mouseWheel, false);
+        ZUI.canvas.addEventListener("DOMMouseScroll", ZUI.mouseWheel, false);
+
+        // intercept contextmenu event
+        ZUI.canvas.oncontextmenu = function(event) {
+            ZUI.contextMenu(event);
+            return false;
+        };
+
+        // initialize ZUI event listeners hash
+        ZUI.eventListeners = new ZUI.Hash();
+
+        // set first view
+        ZUI.activeView = new ZUI.View();
+        ZUI.activeView.active();
+
+        // begin draw loop
+        requestAnimationFrame(ZUI.draw);
+    };
+
+    // draw frame
+    ZUI.draw = function (timeStamp) {
+        // request next frame
+        requestAnimationFrame(ZUI.draw);
+
+        if (timeStamp - ZUI.lastTimeStamp > 1000 / ZUI.frameRate) {
+            // update lastTimeStamp
+            ZUI.lastTimeStamp = timeStamp - ((timeStamp - ZUI.lastTimeStamp) % 1000 / ZUI.frameRate);
+
+            // update app status
+            if (ZUI.appStatus.start == null) {
+                ZUI.appStatus.start = timeStamp;
+            }
+            ZUI.appStatus.progress = timeStamp - ZUI.appStatus.start;
+
+            // update camera
+            ZUI.camera.update();
+
+            // call update
+            ZUI.update();
+
+            // check whether redraw is required
+            var isRedraw = false;
+            for (var n = 0; n < ZUI.activeView.renderedObjects.length; n++) {
+                if (ZUI.activeView.renderedObjects[n].isUpdated) {
+                    ZUI.activeView.renderedObjects[n].render();
+                    ZUI.activeView.renderedObjects[n].isUpdated = false;
+                    isRedraw = true;
+                }
+            }
+
+            // redraw if needed
+            if (isRedraw) {
+                // clear canvas
+                ZUI.context.clearRect(0, 0, ZUI.width, ZUI.height);
+                if (ZUI.backgroundAlpha > 0) {
+                    ZUI.context.save();
+                    ZUI.context.globalAlpha = ZUI.backgroundAlpha;
+                    ZUI.context.strokeStyle = ZUI.background;
+                    ZUI.context.fillStyle = ZUI.background;
+                    ZUI.context.fillRect(0, 0, ZUI.width, ZUI.height)
+                    ZUI.context.restore();
+                }
+
+                // draw active view's rendered objects
+                for (var n = 0; n < ZUI.activeView.renderedObjects.length; n++) {
+                    ZUI.activeView.renderedObjects[n].draw();
+                }
+            }
+
+            // check for mouse over/out events
+            var x = ZUI.mouseStatus.x;
+            var y = ZUI.mouseStatus.y;
+            var renderedObjects = ZUI.activeView.renderedObjects;
+            var renderedObject = null;
+            for (var n = 0; n < renderedObjects.length; n++) {
+                if (renderedObjects[n].isInBound(x, y)) {
+                    renderedObject = renderedObjects[n];
+                }
+            }
+            for (n = 0; n < renderedObjects.length; n++) {
+                if (renderedObjects[n] != renderedObject && renderedObjects[n]._private.isHovered) {
+                    renderedObjects[n]._private.isHovered = false;
+                    renderedObjects[n].mouseOut();
+                }
+            }
+            if (renderedObject) {
+                if (!renderedObject._private.isHovered) {
+                    renderedObject._private.isHovered = true;
+                    renderedObject.mouseOver();
+                }
+            }
+        }
+    };
+
+    // change active view
+    ZUI.changeActiveView = function(view) {
+        ZUI.activeView.inactive();
+        ZUI.activeView = view;
+        ZUI.activeView.active();
+    };
+
+    // mousedown event handler */
+    ZUI.mouseDown = function(event) {
+        var x = ZUI.mouseStatus.x;
+        var y = ZUI.mouseStatus.y;
+        var renderedObjects = ZUI.activeView.renderedObjects;
+        var renderedObject = null;
+        for (var n = renderedObjects.length - 1; n >= 0; n--) {
+            if (renderedObjects[n].isInBound(x, y)) {
+                renderedObject = renderedObjects[n];
+                break;
+            }
+        }
+
+        if (event.button == 0) {
+            ZUI.mouseStatus.leftDown = true;
+            ZUI.activeView.leftMouseDown();
+            if (renderedObject) renderedObject.leftMouseDown();
+        }
+        else if (event.button == 1) {
+            ZUI.mouseStatus.middleDown = true;
+            ZUI.activeView.middleMouseDown();
+            if (renderedObject) renderedObject.middleMouseDown();
+        }
+        else if (event.button == 2) {
+            ZUI.mouseStatus.rightDown = true;
+            ZUI.activeView.rightMouseDown();
+            if (renderedObject) renderedObject.rightMouseDown();
+        }
+        if (ZUI.passInputEvent) {
+            ZUI.passInputEvent(event);
+        }
+    };
+
+    // mouseup event handler
+    ZUI.mouseUp = function(event) {
+        var x = ZUI.mouseStatus.x;
+        var y = ZUI.mouseStatus.y;
+        var renderedObjects = ZUI.activeView.renderedObjects;
+        var renderedObject = null;
+        for (var n = renderedObjects.length - 1; n >= 0; n--) {
+            if (renderedObjects[n].isInBound(x, y)) {
+                renderedObject = renderedObjects[n];
+                break;
+            }
+        }
+
+        if (event.button == 0) {
+            ZUI.mouseStatus.leftDown = false;
+            ZUI.activeView.leftMouseUp();
+            if (renderedObject) renderedObject.leftMouseUp();
+        }
+        else if (event.button == 1) {
+            ZUI.mouseStatus.middleDown = false;
+            ZUI.activeView.middleMouseUp();
+            if (renderedObject) renderedObject.middleMouseUp();
+        }
+        else if (event.button == 2) {
+            ZUI.mouseStatus.rightDown = false;
+            ZUI.activeView.rightMouseUp();
+            if (renderedObject) renderedObject.rightMouseUp();
+        }
+        if (ZUI.passInputEvent) {
+            ZUI.passInputEvent(event);
+        }
+    };
+
+    // mousemove event handler
+    ZUI.mouseMove = function(event) {
+        var mousePosition = ZUI.getMousePosition(event);
+        ZUI.mouseStatus.xLast = ZUI.mouseStatus.x;
+        ZUI.mouseStatus.yLast = ZUI.mouseStatus.y;
+        ZUI.mouseStatus.x = mousePosition.x;
+        ZUI.mouseStatus.y = mousePosition.y;
+
+        var x = ZUI.mouseStatus.x;
+        var y = ZUI.mouseStatus.y;
+        var renderedObjects = ZUI.activeView.renderedObjects;
+        var renderedObject = null;
+        for (var n = 0; n < renderedObjects.length; n++) {
+            if (renderedObjects[n].isInBound(x, y)) {
+                renderedObject = renderedObjects[n];
+            }
+        }
+
+        ZUI.activeView.mouseMove();
+        for (n = 0; n < renderedObjects.length; n++) {
+            if (renderedObjects[n] != renderedObject && renderedObjects[n].isHovered) {
+                renderedObjects[n].isHovered = false;
+                renderedObjects[n].mouseOut();
+            }
+        }
+        if (renderedObject) {
+            renderedObject.mouseMove();
+            if (!renderedObject.isHovered) {
+                renderedObject.isHovered = true;
+                renderedObject.mouseOver();
+            }
+        }
+
+        if (ZUI.passInputEvent) {
+            ZUI.passInputEvent(event);
+        }
+    };
+
+    // click event callback
+    ZUI.click = function(event) {
+        var x = ZUI.mouseStatus.x;
+        var y = ZUI.mouseStatus.y;
+        var renderedObjects = ZUI.activeView.renderedObjects;
+        var renderedObject = null;
+        for (var n = renderedObjects.length - 1; n >= 0; n--) {
+            if (renderedObjects[n].isInBound(x, y)) {
+                renderedObject = renderedObjects[n];
+                break;
+            }
+        }
+
+        if (event.button == 0) {
+            if (ZUI.contextMenu.active) {
+                ZUI.contextMenu.close();
+            }
+            ZUI.activeView.leftClick();
+            if (renderedObject) renderedObject.leftClick();
+        }
+        else if (event.button == 1) {
+            ZUI.activeView.middleClick();
+            if (renderedObject) renderedObject.middleClick();
+        }
+        else if (event.button == 2) {
+            ZUI.activeView.rightClick();
+            if (renderedObject) renderedObject.rightClick();
+        }
+        if (ZUI.passInputEvent) {
+            ZUI.passInputEvent(event);
+        }
+    };
+
+    // dblclick event handler
+    ZUI.doubleClick = function(event) {
+        var x = ZUI.mouseStatus.x;
+        var y = ZUI.mouseStatus.y;
+        var renderedObjects = ZUI.activeView.renderedObjects;
+        var renderedObject = null;
+        for (var n = renderedObjects.length - 1; n >= 0; n--) {
+            if (renderedObjects[n].isInBound(x, y)) {
+                renderedObject = renderedObjects[n];
+                break;
+            }
+        }
+
+        if (event.button == 0) {
+            ZUI.activeView.leftDoubleClick();
+            if (renderedObject) renderedObject.leftDoubleClick();
+        }
+        else if (event.button == 1) {
+            ZUI.activeView.middleDoubleClick();
+            if (renderedObject) renderedObject.middleDoubleClick();
+        }
+        if (ZUI.passInputEvent) {
+            ZUI.passInputEvent(event);
+        }
+    };
+
+    // mousewheel / DOMMouseScroll event handler
+    ZUI.mouseWheel = function(event) {
+        event.preventDefault();
+        var scroll = Math.max(-1, Math.min(1, (event.wheelDelta || -event.detail)));
+
+        var x = ZUI.mouseStatus.x;
+        var y = ZUI.mouseStatus.y;
+        var renderedObjects = ZUI.activeView.renderedObjects;
+        var renderedObject = null;
+        for (var n = renderedObjects.length - 1; n >= 0; n--) {
+            if (renderedObjects[n].isInBound(x, y)) {
+                renderedObject = renderedObjects[n];
+                break;
+            }
+        }
+
+        ZUI.activeView.mouseWheel(scroll);
+        if (renderedObject) renderedObject.mouseWheel(scroll);
+        if (ZUI.passInputEvent) {
+            ZUI.passInputEvent(event);
+        }
+    };
+
+    // contextmenu event handler
+    ZUI.contextMenu = function(event) {
+        var x = ZUI.mouseStatus.x;
+        var y = ZUI.mouseStatus.y;
+        var renderedObjects = ZUI.activeView.renderedObjects;
+        var renderedObject = null;
+        for (var n = renderedObjects.length - 1; n >= 0; n--) {
+            if (renderedObjects[n].isInBound(x, y)) {
+                renderedObject = renderedObjects[n];
+                break;
+            }
+        }
+
+        ZUI.activeView.contextMenu();
+        if (renderedObject) renderedObject.contextMenu();
+        if (ZUI.passInputEvent) {
+            ZUI.passInputEvent(event);
+        }
+    };
+
+    // fires a ZUI event */
+    ZUI.fireEvent = function(event) {
+        // filter event listeners by type
+        var eventListeners1 = ZUI.eventListeners.get(event.type);
+        if (!eventListeners1) {
+            return;
+        }
+
+        // filter event listeners by target
+        var eventListeners2 = eventListeners1.get(event.target);
+        if (eventListeners2) {
+            // execute callback functions
+            for (var n = 0; n < eventListeners2.length; n++) {
+                eventListeners2[n].callback(event, event.data, eventListeners2[n].data);
+            }
+        }
+
+        // execute callback functions with no particular target
+        var eventListeners3 = eventListeners1.get("_all");
+        if (eventListeners3) {
+            for (n = 0; n < eventListeners3.length; n++) {
+                eventListeners3[n].callback(event, event.data, eventListeners3[n].data);
+            }
+        }
+    };
+
+    // adds a ZUI event listener
+    ZUI.addEventListener = function(eventListener) {
+        // filter event listeners by type
+        var eventListeners1 = ZUI.eventListeners.get(eventListener.type);
+        if (!eventListeners1) {
+            eventListeners1 = new ZUI.Hash();
+            ZUI.eventListeners.put(eventListener.type, eventListeners1);
+        }
+
+        // filter event listeners by target
+        var target = eventListener.target;
+        if (target === undefined || target === null) {
+            target = "_all";
+        }
+        var eventListeners2 = eventListeners1.get(target);
+        if (!eventListeners2) {
+            eventListeners2 = [];
+            eventListeners1.put(target, eventListeners2);
+        }
+
+        // add event listener
+        eventListeners2.push(eventListener);
+    };
+
+    // removes a ZUI event listener
+    ZUI.removeEventListener = function(eventListener) {
+        // filter event listeners by type
+        var eventListeners1 = ZUI.eventListeners.get(eventListener.type);
+        if (!eventListeners1) {
+            return;
+        }
+
+        // filter event listeners by target
+        var target = eventListener.target;
+        if (target === undefined || target === null) {
+            target = "_all";
+        }
+        var eventListeners2 = eventListeners1.get(target);
+        if (!eventListeners2) {
+            return;
+        }
+
+        // remove event listener
+        var index = eventListeners2.indexOf(eventListener);
+        if (index < 0) {
+            return;
+        }
+        eventListeners2.splice(index, 1);
+
+        // remove target level eventListeners if empty
+        if (eventListeners2.length == 0) {
+            eventListeners1.delete(target);
+        }
+
+        // remove type level eventListeners if empty
+        if (eventListeners1.length == 0) {
+            ZUI.eventListeners.delete(eventListener.type);
+        }
+    };
+
+    // removes all ZUI event listeners for the specified target
+    ZUI.removeEventListenersForTarget = function(target) {
+        var keys = ZUI.eventListeners.getKeys();
+        for (var n = 0; n < keys.length; n++) {
+            var key = keys[n];
+            var eventListeners = ZUI.eventListeners.get(key);
+            if (eventListeners.get(target)) {
+                eventListeners.delete(target);
+            }
+            if (!eventListeners.getSize()) {
+                ZUI.eventListeners.delete(key);
+            }
+        }
+    };
+
+    // per-frame update with customized logic (override if needed)
+    ZUI.update = function() {};
+
+})();
+
+(function() {
+
+    // constructor
+    ZUI.View = function() {
+        // call base constructor
+        ZUI.Base.call(this);
+
+        this.renderedObjects = [];
+        this.animations = [];
+    };
+
+    // inherit base
+    ZUI.Helper.inheritClass(ZUI.Base, ZUI.View);
+
+    // start an animation
+    ZUI.View.prototype.animate = function(animation) {
+        this.animations.push(animation);
+        animation.begin();
+    };
+
+    // active callback (abstract)
+    ZUI.View.prototype.active = function() {};
+
+    // inactive callback (abstract)
+    ZUI.View.prototype.inactive = function() {};
+
+    // draw callback (abstract)
+    ZUI.View.prototype.draw = function() {};
+
+    // remove callback (abstract)
+    ZUI.View.prototype.remove = function() {};
+
+    // leftMouseDown callback (abstract)
+    ZUI.View.prototype.leftMouseDown = function() {};
+
+    // middleMouseDown callback (abstract)
+    ZUI.View.prototype.middleMouseDown = function() {};
+
+    // rightMouseDown callback (abstract)
+    ZUI.View.prototype.rightMouseDown = function() {};
+
+    // leftMouseUp callback (abstract)
+    ZUI.View.prototype.leftMouseUp = function() {};
+
+    // middleMouseUp callback (abstract)
+    ZUI.View.prototype.middleMouseUp = function() {};
+
+    // rightMouseUp callback (abstract)
+    ZUI.View.prototype.rightMouseUp = function() {};
+
+    // mouseMove callback (abstract)
+    ZUI.View.prototype.mouseMove = function() {};
+
+    // leftClick callback (abstract)
+    ZUI.View.prototype.leftClick = function() {};
+
+    // middleClick callback (abstract)
+    ZUI.View.prototype.middleClick = function() {};
+
+    // rightClick callback (abstract)
+    ZUI.View.prototype.rightClick = function() {};
+
+    // leftDoubleClick callback (abstract)
+    ZUI.View.prototype.leftDoubleClick = function() {};
+
+    // middleDoubleClick callback (abstract)
+    ZUI.View.prototype.middleDoubleClick = function() {};
+
+    // mouseWheel callback (abstract)
+    ZUI.View.prototype.mouseWheel = function(scroll) {};
+
+    // contextMenu callback (abstract)
+    ZUI.View.prototype.contextMenu = function() {};
+
+})();
+
+(function() {
+
+    // constructor
+    ZUI.Animation = function(attributes) {
+        this.view = (attributes.view === undefined) ? null : attributes.view;
+        this.duration = (attributes.duration === undefined) ? 0 : attributes.duration;
+        this.type = (attributes.type === undefined) ? "custom" : attributes.type;
+        this._begin = (attributes.begin === undefined) ? function(){} : attributes.begin;
+        this._end = (attributes.end === undefined) ? function(){} : attributes.end;
+        this._draw = (attributes.draw === undefined) ? function(elapsedTime, remainingTime, view){} : attributes.draw;
+        this.data = (attributes.data === undefined) ? null : attributes.data;
+        if (this.type == "zoom") {
+            this.bezier = (attributes.bezier === undefined) ? [0.25, 0.1, 0.25, 1] : attributes.bezier;
+            this.spline = new ZUI.Util.KeySpline(this.bezier[0], this.bezier[1], this.bezier[2], this.bezier[3]);
+            this.sourceX = (attributes.sourceX === undefined) ? undefined : attributes.sourceX;
+            this.sourceY = (attributes.sourceY === undefined) ? undefined : attributes.sourceY;
+            this.sourceDistance = (attributes.sourceDistance === undefined) ? undefined : attributes.sourceDistance;
+            this.targetX = (attributes.targetX === undefined) ? undefined : attributes.targetX;
+            this.targetY = (attributes.targetY === undefined) ? undefined : attributes.targetY;
+            this.targetDistance = (attributes.targetDistance === undefined) ? undefined : attributes.targetDistance;
+        }
+    };
+
+    // begin
+    ZUI.Animation.prototype.begin = function() {
+        if (this.view) {
+            this.view.animation = this;
+        }
+        this.startTime = ZUI.Util.getTime();
+        this.remainingTime = this.duration;
+        if (this.type == "zoom") {
+            if (this.sourceX === undefined) this.sourceX = ZUI.camera._x;
+            if (this.sourceY === undefined) this.sourceY = ZUI.camera._y;
+            if (this.sourceDistance === undefined) this.sourceDistance = ZUI.camera._distance;
+            if (this.targetX === undefined) this.targetX = this.sourceX;
+            if (this.targetY === undefined) this.targetY = this.sourceY;
+            if (this.targetDistance === undefined) this.targetDistance = this.sourceDistance;
+        }
+        this._begin(this.data);
+        if (this.remainingTime <= 0) {
+            this.end();
+        }
+    };
+
+    // end
+    ZUI.Animation.prototype.end = function() {
+        if (this.view && this.view.animation == this) {
+            this.view.animation = null;
+        }
+        if (this.type == "zoom") {
+            ZUI.camera._x = ZUI.camera.x = this.targetX;
+            ZUI.camera._y = ZUI.camera.y = this.targetY;
+            ZUI.camera._distance = ZUI.camera.distance = this.targetDistance;
+        }
+        this._end(this.data);
+    };
+
+    // draw
+    ZUI.Animation.prototype.draw = function() {
+        var currentTime = ZUI.Util.getTime();
+        this.elapsedTime = currentTime - this.startTime;
+        this.remainingTime = this.duration - this.elapsedTime;
+        if (this.remainingTime > 0) {
+            if (this.type == "zoom") {
+                var time = this.elapsedTime / (this.elapsedTime + this.remainingTime);
+                var progress = this.spline.get(time);
+                ZUI.camera._x = ZUI.camera.x = (this.targetX - this.sourceX) * progress + this.sourceX;
+                ZUI.camera._y = ZUI.camera.y = (this.targetY - this.sourceY) * progress + this.sourceY;
+                ZUI.camera._distance = ZUI.camera.distance = (this.targetDistance - this.sourceDistance) * progress + this.sourceDistance;
+            }
+            this._draw(this.elapsedTime, this.remainingTime, this.view, this.data);
+        }
+        else {
+            this.end();
+        }
+    };
+
+})();
+
+(function() {
+
+    // constructor
+    ZUI.ContextMenu = function() {
+        // call base constructor
+        ZUI.Base.call(this);
+
+        // properties
+        this.options = null;
+        this.x = 0;
+        this.y = 0;
+        this.active = false;
+        this.container = document.createElement('div');
+
+        // set up DOM element
+        this.container.className = 'zui-contextMenu';
+        this.container.style.border = '1px solid #B4B4B4';
+        this.container.style.width = '160px';
+        this.container.style.height = 'auto';
+        this.container.style.minHeight = '0';
+        this.container.style.position = 'relative';
+        this.container.style.left = ((this.x > ZUI.width / 2) ? (this.x - 162) : this.x) + 'px';
+        this.container.style.top = this.y + 'px';
+        this.container.oncontextmenu = function() {
+            return false;
+        };
+    };
+
+    // inherit base
+    ZUI.Helper.inheritClass(ZUI.Base, ZUI.ContextMenu);
+
+    // open
+    ZUI.ContextMenu.prototype.open = function(x, y, options) {
+        // close context menu if already open
+        if (this.active) {
+            this.close();
+        }
+
+        // set position, if specified
+        if (x === undefined && y === undefined) {
+            this.x = ZUI.mouseStatus.x;
+            this.y = ZUI.mouseStatus.y;
+            this.container.style.left = ((this.x > ZUI.width / 2) ? (this.x - 162) : this.x) + 'px';
+            this.container.style.top = this.y + 'px';
+        }
+        else {
+            this.x = x;
+            this.y = y;
+            this.container.style.left = ((this.x > ZUI.width / 2) ? (this.x - 162) : this.x) + 'px';
+            this.container.style.top = this.y + 'px';
+        }
+
+        // add options
+        this.options = options;
+        for (var n = 0; n < options.length; n++) {
+            this.container.appendChild(options[n].container);
+            options[n].contextMenu = this;
+        }
+
+        // append context menu container to document
+        ZUI.container.appendChild(this.container);
+
+        // change status to active
+        this.active = true;
+    };
+
+    // close
+    ZUI.ContextMenu.prototype.close = function() {
+        // remove context menu container from document
+        ZUI.container.removeChild(this.container);
+
+        // clear options
+        this.options = null;
+        this.container.innerHTML = '';
+
+        // change status to inactive
+        this.active = false;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////////
+
+    // constructor
+    ZUI.ContextMenu.Option = function(label, callback, data, enabled, autoClose) {
+        // call base constructor
+        ZUI.Base.call(this);
+
+        // properties
+        this.label = label;
+        this.callback = callback;
+        this.data = data;
+        this.enabled = (enabled === undefined) ? true : enabled;
+        this.autoClose = (autoClose === undefined) ? true : autoClose;
+        this.contextMenu = null;
+        this.container = document.createElement("span");
+
+        // set up DOM element
+        this.container.className = "zui-contextMenu-option";
+        this.container.style.padding = "3px 20px";
+        this.container.style.display = "block";
+        this.container.style.width = "120px";
+        if (this.enabled) {
+            this.container.style.backgroundColor = "#FFFFFF";
+            this.container.style.color = "#3C3C3C";
+        }
+        else {
+            this.container.style.backgroundColor = "#FFFFFF";
+            this.container.style.color = "#B4B4B4";
+        }
+        this.container.innerHTML = label;
+        this.container.onmouseover = (function() {
+            if (this.enabled) {
+                this.container.style.backgroundColor = "#787878";
+                this.container.style.color = "#FFFFFF";
+            }
+            else {
+                this.container.style.backgroundColor = "#FFFFFF";
+                this.container.style.color = "#B4B4B4";
+            }
+        }).bind(this);
+        this.container.onmouseout = (function() {
+            if (this.enabled) {
+                this.container.style.backgroundColor = "#FFFFFF";
+                this.container.style.color = "#3C3C3C";
+            }
+            else {
+                this.container.style.backgroundColor = "#FFFFFF";
+                this.container.style.color = "#B4B4B4";
+            }
+        }).bind(this);
+        this.container.onclick = (function(){
+            this.callback(this.data);
+            if (this.autoClose && this.contextMenu.active) {
+                this.contextMenu.close();
+            }
+        }).bind(this);
+    };
+
+    // inherit base
+    ZUI.Helper.inheritClass(ZUI.Base, ZUI.ContextMenu.Option);
+
+})();
+
+
+(function() {
+
+    // add namespace
+    ZUI.Def = {};
+
+})();
+
+(function() {
+
+    ZUI.Def.Left = 0x0001;
+    ZUI.Def.Right = 0x0002;
+    ZUI.Def.Top = 0x0003;
+    ZUI.Def.Bottom = 0x0004;
+    ZUI.Def.Center = 0x0005;
+
+    ZUI.Def.WorldScale = 0x0011;
+    ZUI.Def.ScreenScale = 0x0012;
+
+})();
+
+(function() {
+
+    // add namespace
+    ZUI.Math = {};
+
+})();
+
+(function() {
+
+    // calculate the log of a number with a specified base
+    ZUI.Math.log = function(number, base) {
+        return Math.log(number) / Math.log(base);
+    };
+
+    // calculate mean for a group of numbers
+    ZUI.Math.mean = function(numbers) {
+        var sum = 0;
+        for (var n = 0; n < numbers.length; n++) {
+            sum += numbers[n];
+        }
+        return sum / numbers.length;
+    };
+
+    // calculate standard deviation for a group of numbers
+    ZUI.Math.stDev = function(numbers) {
+        if (numbers.length < 2) return Number.NaN;
+        var mean = ZUI.Helper.mean(numbers);
+        var sqSum = 0;
+        for (var n = 0; n < numbers.length; n++) {
+            sqSum += Math.pow(mean - numbers[n], 2);
+        }
+        return Math.sqrt(sqSum / (numbers.length - 1));
+    };
+
+    // calculate standard error for a group of numbers
+    ZUI.Math.stError = function(numbers) {
+        if (numbers.length < 2) return Number.NaN;
+        return ZUI.Helper.stdev(numbers) / Math.sqrt(numbers.length);
+    };
+
+})();
+
+(function() {
+
+    // add namespace
+    ZUI.Helper = {};
+
+})();
+
+(function() {
+
+    /**
+     * Taken from http://greweb.me/2012/02/bezier-curve-based-easing-functions-from-concept-to-implementation/
+     */
+
+    /**
+     * KeySpline - use bezier curve for transition easing function
+     * is inspired from Firefox's nsSMILKeySpline.cpp
+     * Usage:
+     * var spline = new KeySpline(0.25, 0.1, 0.25, 1.0)
+     * spline.get(x) => returns the easing value | x must be in [0, 1] range
+     */
+    ZUI.Helper.KeySpline = function(mX1, mY1, mX2, mY2) {
+
+        this.get = function(aX) {
+            if (mX1 == mY1 && mX2 == mY2) return aX; // linear
+            return CalcBezier(GetTForX(aX), mY1, mY2);
+        }
+
+        function A(aA1, aA2) { return 1.0 - 3.0 * aA2 + 3.0 * aA1; }
+        function B(aA1, aA2) { return 3.0 * aA2 - 6.0 * aA1; }
+        function C(aA1)      { return 3.0 * aA1; }
+
+        // Returns x(t) given t, x1, and x2, or y(t) given t, y1, and y2.
+        function CalcBezier(aT, aA1, aA2) {
+            return ((A(aA1, aA2)*aT + B(aA1, aA2))*aT + C(aA1))*aT;
+        }
+
+        // Returns dx/dt given t, x1, and x2, or dy/dt given t, y1, and y2.
+        function GetSlope(aT, aA1, aA2) {
+            return 3.0 * A(aA1, aA2)*aT*aT + 2.0 * B(aA1, aA2) * aT + C(aA1);
+        }
+
+        function GetTForX(aX) {
+            // Newton raphson iteration
+            var aGuessT = aX;
+            for (var i = 0; i < 4; ++i) {
+                var currentSlope = GetSlope(aGuessT, mX1, mX2);
+                if (currentSlope == 0.0) return aGuessT;
+                var currentX = CalcBezier(aGuessT, mX1, mX2) - aX;
+                aGuessT -= currentX / currentSlope;
+            }
+            return aGuessT;
+        }
+    }
+
+})();
+
+(function() {
+
+    // remove an item from an array
+    ZUI.Helper.removeFromArray = function(array, item) {
+        var index = array.indexOf(item);
+        if (index >= 0) {
+            array.splice(index, 1);
+        }
+        return item;
+    };
+
+    // inherit parent class prototype without calling parent constructor
+    ZUI.Helper.inheritClass = function(parent, child) {
+        function protoCreator() {
+            this.constructor = child.prototype.constructor;
+        }
+        protoCreator.prototype = parent.prototype;
+        child.prototype = new protoCreator();
+    };
+
+    // assign default property to an object recursively if the property is undefined
+    ZUI.Helper.assignDefaultProperty = function (propertyName, obj, defaultProperty) {
+        var hasProperties = false;
+        if ((typeof defaultProperty) !== 'string') {
+            for (var foo in defaultProperty) {
+                hasProperties = true;
+                break;
+            }
+        }
+        if (obj[propertyName] === undefined) {
+            if (hasProperties) {
+                obj[propertyName] = {};
+            }
+            else {
+                obj[propertyName] = defaultProperty;
+            }
+        }
+        if ((typeof defaultProperty) !== 'string') {
+            for (var foo in defaultProperty) {
+                ZUI.Helper.assignDefaultProperty(foo, obj[propertyName], defaultProperty[foo]);
+            }
+        }
+        return obj[propertyName];
+    };
+
+    // interpret the scale option and returns the updated value
+    ZUI.Helper.interpretScale = function(value, scale) {
+        if (scale === ZUI.Def.ScreenScale) {
+            return value;
+        }
+        else if (scale === ZUI.Def.WorldScale) {
+            // point
+            if (isNaN(Number(value))) {
+                return ZUI.camera.projectPoint(value);
+            }
+
+            // distance
+            else {
+                return ZUI.camera.projectDistance(value);
+            }
+        }
+        else {
+            return null;
+        }
+    };
+
+    // interpret the centerAt option and returns the updated position
+    ZUI.Helper.interpretCenterAt = function(position, positionOffset, width, height, centerAt) {
+        var adustedPosition = {
+            x: position.x + positionOffset.x,
+            y: position.y + positionOffset.y
+        }
+
+        if (this.centerAt.horizontal === ZUI.Def.Left) {
+            adustedPosition.x -= 0;
+        }
+        else if (this.centerAt.horizontal === ZUI.Def.Center) {
+            adustedPosition.x -= width / 2;
+        }
+        else if (this.centerAt.horizontal === ZUI.Def.Right) {
+            adustedPosition.x -= width;
+        }
+        else {
+            throw {
+                name: 'InvalidPropertyException',
+                message: 'Value of centerAt is invalid.'
+            };
+        }
+
+        if (this.centerAt.vertical === ZUI.Def.Top) {
+            adustedPosition.y -= 0;
+        }
+        else if (this.centerAt.vertical === ZUI.Def.Center) {
+            adustedPosition.y -= height / 2;
+        }
+        else if (this.centerAt.vertical === ZUI.Def.Bottom) {
+            adustedPosition.y -= height;
+        }
+        else {
+            throw {
+                name: 'InvalidPropertyException',
+                message: 'Value of centerAt is invalid.'
+            };
+        }
+
+        return adustedPosition;
+    };
+
+    // check whether a color string is valid
+    ZUI.Helper.isValidColor = function(str) {
+        if (!str || !str.match) {
+            return null;
+        }
+        else {
+            return str.match(/^#[a-f0-9]{6}$/i) !== null;
+        }
+    };
+
+    // check whether a string ends with a suffix
+    ZUI.Helper.isEndsWith = function(str, suffix) {
+        return str.indexOf(suffix, str.length - suffix.length) !== -1;
+    };
+
+    // convert number to to string with comma-separators
+    ZUI.Helper.getNumberWithComma = function(number) {
+        /* By mikez302, http://stackoverflow.com/questions/2901102/how-to-print-a-number-with-commas-as-thousands-separators-in-javascript */
+        var parts = (number + '').split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        return parts.join('.');
+    };
+
+    // get index of a regex in a string
+    ZUI.Helper.regexIndexOf = function(string, regex, start) {
+        var index = string.substring(start || 0).search(regex);
+        return (index >= 0) ? (index + (start || 0)) : index;
+    };
+
+    // get time in milliseconds since 1970/01/01
+    ZUI.Helper.getTime = function() {
+        return (new Date()).getTime();
+    };
+
+    // stop bubbling through DOM hierarchy
+    ZUI.Helper.stopBubble = function(event) {
+        event.stopPropagation();
+    };
+
+    // get color string from color components
+    ZUI.Helper.getColorString = function(red, green, blue) {
+        if (red.red !== undefined && red.green !== undefined && red.blue !== undefined) {
+            var color = red;
+            red = color.red;
+            green = color.green;
+            blue = color.blue;
+        }
+        var _red = red.toString(16);
+        if (_red.length == 1) _red = '0' + _red;
+        var _green = green.toString(16);
+        if (_green.length == 1) _green = '0' + _green;
+        var _blue = blue.toString(16);
+        if (_blue.length == 1) _blue = '0' + _blue;
+        return '#' + _red + _green + _blue;
+    };
+
+    // get color components from a color string
+    ZUI.Helper.getColorComponents = function(color) {
+        var _color = color.substring(0);
+        if (_color[0] == '#') {
+            _color = color.substring(1);
+        }
+        var red = parseInt(_color.substring(0, 2), 16);
+        var green = parseInt(_color.substring(2, 4), 16);
+        var blue = parseInt(_color.substring(4, 6), 16);
+        if (isNaN(red) || isNaN(green) || isNaN(blue)) {
+            return null;
+        }
+        else {
+            return {
+                red: red,
+                green: green,
+                blue: blue
+            };
+        }
+    };
+
+    // get property from its path string
+    ZUI.Helper.readPropertyPath = function(propertyPath) {
+        var parts = propertyPath.split('.');
+        var scope = window;
+        for (var n = 0; n < parts.length; n++) {
+            scope = scope[parts[n]];
+            if (scope === undefined || scope === null) {
+                throw {
+                    name: 'BadPathException',
+                    message: 'The path ' + propertyPath + ' cannot be found.'
+                };
+                return undefined;
+            }
+        }
+        return scope;
+    };
+
+    // parses an SVG path and outputs an object
+    ZUI.Helper.parseSVGPath = function(path) {
+        // splits the path string into instructions
+        var instructions = [];
+        for (var n = 0; n + 1 < path.length;) {
+            var instruction = path[n];
+            var next = ZUI.Util.regexIndexOf(path, "[A-Za-z]", n + 1);
+            if (next < 0) next = path.length;
+            var args = path.substring(n + 1, next).replace(new RegExp("([0-9])-", "gi"), "$1,-").trim().replace(new RegExp("[\t\n ,]+", "gi"), ",").split(/[,]+/);
+            for (var m = 0; m < args.length; m++) {
+                args[m] = Number(args[m]);
+            }
+            instructions.push({
+                instruction: instruction,
+                args: args
+            });
+            n = next;
+        }
+
+        // process instructions
+        var objs = []
+        var lastX = 0, lastY = 0;
+        for (n = 0; n < instructions.length; n++) {
+            if (instructions[n].instruction == "M") {			// moveto (absolute)
+                var obj = {};
+                obj.instruction = "moveTo";
+                obj.args = [instructions[n].args[0], instructions[n].args[1]];
+                objs.push(obj);
+                lastX = instructions[n].args[0];
+                lastY = instructions[n].args[1];
+            }
+            else if (instructions[n].instruction == "m") {		// moveto (relative)
+                var obj = {};
+                obj.instruction = "moveTo";
+                obj.args = [instructions[n].args[0] + lastX, instructions[n].args[1] + lastY];
+                objs.push(obj);
+                lastX += instructions[n].args[0];
+                lastY += instructions[n].args[1];
+            }
+            else if (instructions[n].instruction == "Z" || instructions[n].instruction == "z") {	// closepath
+                var obj = {};
+                obj.instruction = "closePath";
+                obj.args = [];
+                objs.push(obj);
+            }
+            else if (instructions[n].instruction == "L") {		// lineto (absolute)
+                var obj = {};
+                obj.instruction = "lineTo";
+                obj.args = [instructions[n].args[0], instructions[n].args[1]];
+                objs.push(obj);
+                lastX = instructions[n].args[0];
+                lastY = instructions[n].args[1];
+            }
+            else if (instructions[n].instruction == "l") {		// lineto (relative)
+                var obj = {};
+                obj.instruction = "lineTo";
+                obj.args = [instructions[n].args[0] + lastX, instructions[n].args[1] + lastY];
+                objs.push(obj);
+                lastX += instructions[n].args[0];
+                lastY += instructions[n].args[1];
+            }
+            else if (instructions[n].instruction == "H") {		// horizontal lineto (absolute)
+                var obj = {};
+                obj.instruction = "lineTo";
+                obj.args = [instructions[n].args[0], lastY];
+                objs.push(obj);
+                lastX = instructions[n].args[0];
+            }
+            else if (instructions[n].instruction == "h") {		// horizontal lineto (relative)
+                var obj = {};
+                obj.instruction = "lineTo";
+                obj.args = [instructions[n].args[0] + lastX, lastY];
+                objs.push(obj);
+                lastX += instructions[n].args[0];
+            }
+            else if (instructions[n].instruction == "V") {		// vertical lineto (absolute)
+                var obj = {};
+                obj.instruction = "lineTo";
+                obj.args = [lastX, instructions[n].args[0]];
+                objs.push(obj);
+                lastY = instructions[n].args[0];
+            }
+            else if (instructions[n].instruction == "v") {		// vertical lineto (relative)
+                var obj = {};
+                obj.instruction = "lineTo";
+                obj.args = [lastX, instructions[n].args[0] + lastY];
+                objs.push(obj);
+                lastY += instructions[n].args[0];
+            }
+            else if (instructions[n].instruction == "C") {		// curveto (absolute)
+                var obj = {};
+                obj.instruction = "bezierCurveTo";
+                obj.args = [instructions[n].args[0], instructions[n].args[1], instructions[n].args[2], instructions[n].args[3], instructions[n].args[4], instructions[n].args[5]];
+                objs.push(obj);
+                lastX = instructions[n].args[4];
+                lastY = instructions[n].args[5];
+            }
+            else if (instructions[n].instruction == "c") {		// curveto (relative)
+                var obj = {};
+                obj.instruction = "bezierCurveTo";
+                obj.args = [instructions[n].args[0] + lastX, instructions[n].args[1] + lastY, instructions[n].args[2] + lastX, instructions[n].args[3] + lastY, instructions[n].args[4] + lastX, instructions[n].args[5] + lastY];
+                objs.push(obj);
+                lastX += instructions[n].args[4];
+                lastY += instructions[n].args[5];
+            }
+            else if (instructions[n].instruction == "S") {		// shorthand/smooth curveto (absolute)
+                var obj = {};
+                obj.instruction = "bezierCurveTo";
+                obj.args = [lastX, lastY, instructions[n].args[0], instructions[n].args[1], instructions[n].args[2], instructions[n].args[3]];
+                objs.push(obj);
+                lastX = instructions[n].args[2];
+                lastY = instructions[n].args[3];
+            }
+            else if (instructions[n].instruction == "s") {		// shorthand/smooth curveto (relative)
+                var obj = {};
+                obj.instruction = "bezierCurveTo";
+                obj.args = [lastX, lastY, instructions[n].args[0] + lastX, instructions[n].args[1] + lastY, instructions[n].args[2] + lastX, instructions[n].args[3] + lastY];
+                objs.push(obj);
+                lastX += instructions[n].args[2];
+                lastY += instructions[n].args[3];
+            }
+            else if (instructions[n].instruction == "Q") {		// quadratic Bezier curveto (absolute)
+                var obj = {};
+                obj.instruction = "quadraticCurveTo";
+                obj.args = [instructions[n].args[0], instructions[n].args[1], instructions[n].args[2], instructions[n].args[3]];
+                objs.push(obj);
+                lastX = instructions[n].args[2];
+                lastY = instructions[n].args[3];
+            }
+            else if (instructions[n].instruction == "q") {		// quadratic Bezier curveto (relative)
+                var obj = {};
+                obj.instruction = "quadraticCurveTo";
+                obj.args = [instructions[n].args[0] + lastX, instructions[n].args[1] + lastY, instructions[n].args[2] + lastX, instructions[n].args[3] + lastY];
+                objs.push(obj);
+                lastX += instructions[n].args[2];
+                lastY += instructions[n].args[3];
+            }
+            else if (instructions[n].instruction == "T") {		// shorthand/smooth quadratic Bezier curveto (absolute)
+                var obj = {};
+                obj.instruction = "quadraticCurveTo";
+                obj.args = [lastX, lastY, instructions[n].args[0], instructions[n].args[1]];
+                objs.push(obj);
+                lastX = instructions[n].args[0];
+                lastY = instructions[n].args[1];
+            }
+            else if (instructions[n].instruction == "t") {		// shorthand/smooth quadratic Bezier curveto (relative)
+                var obj = {};
+                obj.instruction = "quadraticCurveTo";
+                obj.args = [lastX, lastY, instructions[n].args[0] + lastX, instructions[n].args[1] + lastY];
+                objs.push(obj);
+                lastX += instructions[n].args[0];
+                lastY += instructions[n].args[1];
+            }
+            else if (instructions[n].instruction == "A") {		// elliptical arc (absolute), NOT THE SAME AS THE SVG COMMAND
+                var obj = {};
+                obj.instruction = "arcTo";
+                obj.args = [instructions[n].args[0], instructions[n].args[1], instructions[n].args[2], instructions[n].args[3], instructions[n].args[4]];
+                objs.push(obj);
+                lastX = instructions[n].args[2];
+                lastY = instructions[n].args[3];
+            }
+            else if (instructions[n].instruction == "a") {		// elliptical arc (relative), NOT THE SAME AS THE SVG COMMAND
+                var obj = {};
+                obj.instruction = "arcTo";
+                obj.args = [instructions[n].args[0] + lastX, instructions[n].args[1] + lastY, instructions[n].args[2] + lastX, instructions[n].args[3] + lastY, instructions[n].args[4]];
+                objs.push(obj);
+                lastX += instructions[n].args[2];
+                lastY += instructions[n].args[3];
+            }
+        }
+
+        return objs;
+    };
+
+})();
+
+(function() {
+
+    // add namespace
+    ZUI.Camera = {};
+
+})();
+
+(function() {
+
+    // constructor
+    ZUI.Camera.DefaultCamera = function(properties) {
+        // call base constructor
+        ZUI.Base.call(this);
+
+        // transfer properties to this object
+        for (var propertyName in properties) {
+            this[propertyName] = properties[propertyName];
+        }
+
+        // save scope for access by child scopes
+        var that = this;
+
+        // assign default to undefined properties
+        //   data
+        //   position
+        //   truePosition
+        //   distance
+        //   trueDistance
+        //   fov
+        //   followRate
+        (function () {
+            // define default properties
+            var defaultProperties = {
+                data: {},
+                position: {
+                    x: 0,
+                    y: 0
+                },
+                truePosition: {
+                    x: 0,
+                    y: 0
+                },
+                positionOffset: {
+                    x: 0,
+                    y: 0
+                },
+                distance: null,
+                trueDistance: null,
+                fov: Math.PI / 2,
+                followRate: 1
+            };
+            defaultProperties.distance = defaultProperties.trueDistance = (ZUI.width / 2) / Math.tan(defaultProperties.fov / 2);
+
+            // assign default to undefined properties
+            for (var propertyName in defaultProperties) {
+                ZUI.Helper.assignDefaultProperty(propertyName, that, defaultProperties[propertyName]);
+            }
+        })();
+    };
+
+    // inherit base prototype
+    ZUI.Helper.inheritClass(ZUI.Base, ZUI.Camera.DefaultCamera);
+
+    // update
+    ZUI.Camera.DefaultCamera.prototype.update = function () {
+        if (this.truePosition.x != this.position.x) {
+            this.truePosition.x += (this.position.x - this.truePosition.x) * this.moveRate;
+            if (Math.abs(this.position.x - this.truePosition.x) < this.trueDistance * 0.005) this.truePosition.x = this.position.x;
+        }
+
+        if (this.truePosition.y != this.position.y) {
+            this.truePosition.y += (this.position.y - this.truePosition.y) * this.moveRate;
+            if (Math.abs(this.position.y - this.truePosition.y) < this.trueDistance * 0.005) this.truePosition.y = this.position.y;
+        }
+
+        if (this.trueDistance != this.distance) {
+            this.trueDistance += (this.distance - this.trueDistance) * this.moveRate;
+            if (Math.abs(this.distance - this.trueDistance) < this.trueDistance * 0.005) this.trueDistance = this.distance;
+        }
+    };
+
+    // set position
+    ZUI.Camera.DefaultCamera.prototype.setPosition = function(x, y) {
+        this.position.x = this.truePosition.x = x;
+        this.position.y = this.truePosition.y = y;
+    };
+
+    // set distance
+    ZUI.Camera.DefaultCamera.prototype.setDistance = function(distance) {
+        this.distance = this.trueDistance = distance;
+    };
+
+    // project point
+    ZUI.Camera.DefaultCamera.prototype.projectPoint = function(point) {
+        var pixelsPerUnit = ZUI.width / (Math.tan(this.fov / 2) * this.trueDistance * 2);
+        return {
+            x: (point.x - ZUI.camera._x) * pixelsPerUnit + ZUI.width / 2,
+            y: (point.y - ZUI.camera._y) * pixelsPerUnit + ZUI.height / 2
+        };
+    };
+
+    // unproject point
+    ZUI.Camera.DefaultCamera.prototype.unprojectPoint = function(point) {
+        var pixelsPerUnit = ZUI.width / (Math.tan(this.fov / 2) * this.trueDistance * 2);
+        return {
+            x: (point.x - ZUI.width / 2) / pixelsPerUnit + ZUI.camera.truePosition.x,
+            y: (point.y - ZUI.height / 2) / pixelsPerUnit + ZUI.camera.truePosition.y
+        };
+    };
+
+    // project distance
+    ZUI.Camera.DefaultCamera.prototype.projectDistance = function(distance) {
+        var pixelsPerUnit = ZUI.width / (Math.tan(this.fov / 2) * this.trueDistance * 2);
+        return distance * pixelsPerUnit;
+    };
+
+    // unproject distance
+    ZUI.Camera.DefaultCamera.prototype.unprojectDistance = function(distance) {
+        var pixelsPerUnit = ZUI.width / (Math.tan(this.fov / 2) * this.trueDistance * 2);
+        return distance / pixelsPerUnit;
+    };
+
+    // reset
+    ZUI.Camera.DefaultCamera.prototype.reset = function() {
+        this.setPosition(0, 0);
+        this.setDistance((ZUI.width / 2) / Math.tan(this.fov / 2));
+    };
+
+})();
+
+(function() {
+
+    // add namespace
+    ZUI.RenderedObject = {};
+
+})();
+
+(function () {
+
+    // constructor
+    ZUI.RenderedObject.Base = function (properties) {
+        // call base constructor
+        ZUI.Base.call(this);
+
+        // private properties
+        this._private.isUpdated = true;
+        this._private.isReady = false;
+        this._private.canvas = document.createElement('canvas');
+        this._private.context = this._private.canvas.getContext('2d');
+        this._private.views = [];
+        this._private.isHovered = false;
+
+        // set canvas size
+        this._private.canvas.width = ZUI.width;
+        this._private.canvas.height = ZUI.height;
+
+        // transfer properties to this object
+        for (var propertyName in properties) {
+            this[propertyName] = properties[propertyName];
+        }
+
+        // save scope for access by child scopes
+        var that = this;
+
+        // assign default to undefined properties
+        //   data
+        //   position {x, y}
+        //   positionScale
+        //   positionOffset {x, y}
+        //   positionOffsetScale
+        //   stroke
+        //   strokeColor
+        //   strokeThickness
+        //   strokeThicknessScale
+        //   fill
+        //   fillColor
+        //   alpha
+        //   centerAt {horizontal, vertical}
+        (function () {
+            // define default properties
+            var defaultProperties = {
+                data: {},
+                position: {
+                    x: 0,
+                    y: 0
+                },
+                positionScale: ZUI.Def.WorldScale,
+                positionOffset: {
+                    x: 0,
+                    y: 0
+                },
+                positionOffsetScale: ZUI.Def.ScreenScale,
+                stroke: true,
+                strokeColor: "#000000",
+                strokeThickness: 1,
+                strokeThicknessScale: ZUI.Def.WorldScale,
+                fill: true,
+                fillColor: "#FFFFFF",
+                alpha: 1,
+                centerAt: {
+                    horizontal: ZUI.Def.Left,
+                    vertical: ZUI.Def.Top
+                }
+            };
+
+            // assign default to undefined properties
+            for (var propertyName in defaultProperties) {
+                ZUI.Helper.assignDefaultProperty(propertyName, that, defaultProperties[propertyName]);
+            }
+        })();
+    };
+
+    // inherit base
+    ZUI.Helper.inheritClass(ZUI.Base, ZUI.RenderedObject.Base);
+
+    // attach to view
+    ZUI.RenderedObject.Base.prototype.attachToView = function(view) {
+        this._private.views.push(view);
+        view.renderedObjects.push(this);
+        return this;
+    };
+
+    // detach from view
+    ZUI.RenderedObject.Base.prototype.detachFromView = function (view) {
+        ZUI.Helper.removeFromArray(this._private.views, view);
+        ZUI.Helper.removeFromArray(view.renderedObjects, this);
+        return this;
+    };
+
+    // draw
+    ZUI.RenderedObject.Base.prototype.draw = function () {
+        if (this._private.isUpdated) {
+            this.render();
+        }
+
+        ZUI.context.drawImage(this._private.canvas, 0, 0);
+    };
+
+    // point hit test
+    ZUI.RenderedObject.Base.prototype.pointHitTest = function (x, y) {
+        this._private.context.isPointInPath(x, y);
+    };
+
+    // render (abstract)
+    ZUI.RenderedObject.Base.prototype.render = function () {
+        // clear canvas
+        this._private.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // get rendered position
+        this.renderedPosition = ZUI.Helper.interpretScale(this.position, this.positionScale);
+
+        this.renderedPositionOffset = ZUI.Helper.interpretScale(this.positionOffset, this.positionOffsetScale);
+
+        // get rendered stroke thickness
+        this.renderedStrokeThickness = ZUI.Helper.interpretScale(this.strokeThickness, this.strokeThicknessScale);
+    };
+
+})();
+
+(function() {
+
+    // constructor
+    ZUI.RenderedObject.Circle = function(properties) {
+        // call base constructor
+        ZUI.RenderedObject.Base.call(this, properties);
+
+        // save scope for access by child scopes
+        var that = this;
+
+        // assign default to undefined properties
+        //   radius
+        //   radiusScale
+        //   hRadius
+        //   hRadiusScale
+        //   vRadius
+        //   vRadiusScale
+        (function () {
+            // define default properties (part 1)
+            var defaultProperties = {
+                radius: 0,
+                radiusScale: ZUI.Def.WorldScale
+            };
+
+            // assign default to undefined properties
+            for (var propertyName in defaultProperties) {
+                ZUI.Helper.assignDefaultProperty(propertyName, that, defaultProperties[propertyName]);
+            }
+
+            // define default properties (part 2)
+            var defaultProperties = {
+                hRadius: that.radius,
+                hRadiusScale: that.radiusScale,
+                vRadius: that.radius,
+                vRadiusScale: that.radiusScale
+            };
+
+            // assign default to undefined properties
+            for (var propertyName in defaultProperties) {
+                ZUI.Helper.assignDefaultProperty(propertyName, that, defaultProperties[propertyName]);
+            }
+        })();
+
+        // set ready flag
+        this._private.isReady = true;
+    };
+
+    // inherit base prototype
+    ZUI.Helper.inheritClass(ZUI.RenderedObject.Base, ZUI.RenderedObject.Circle);
+
+    // render
+    ZUI.RenderedObject.Circle.prototype.render = function () {
+        // call base method
+        ZUI.RenderedObject.Base.prototype.render.call(this);
+
+        // get rendered size
+        this.renderedRadius = ZUI.Helper.interpretScale(this.radius, this.radiusScale);
+        this.renderedHRadius = ZUI.Helper.interpretScale(this.hRadius, this.hRadiusScale);
+        this.renderedVRadius = ZUI.Helper.interpretScale(this.vRadius, this.vRadiusScale);
+
+        // get adjusted position
+        var adjustedPosition = ZUI.Helper.interpretCenterAt({
+            x: this.renderedPosition.x - this.renderedRadius,
+            y: this.renderedPosition.y - this.renderedRadius
+        }, this.renderedPositionOffset, this.renderedRadius * 2, this.renderedRadius * 2, this.centerAt);
+
+        // set up context
+        this._private.context.save();
+        this._private.context.strokeStyle = this.strokeColor;
+        this._private.context.fillStyle = this.fillColor;
+        this._private.context.globalAlpha = this.alpha;
+        this._private.context.lineWidth = this.renderedStrokeThickness;
+
+        // render
+        this._private.context.save();
+        this._private.context.translate(adjustedPosition.x, adjustedPosition.y);
+        this._private.context.scale(this.renderedHRadius, this.renderedVRadius);
+        this._private.context.beginPath();
+        this._private.context.arc(0, 0, 1, 0, 2 * Math.PI);
+        this._private.context.closePath();
+        ZUI.context.restore();
+        if (this.stroke) {
+            this._private.context.stroke();
+        }
+        if (this.fill) {
+            this._private.context.fill();
+        }
+
+        // restore context
+        this._private.context.restore();
+
+        // set update flag
+        this._private.isUpdated = false;
+    };
+
+})();
+
+
+
+
+
+
+
+
+
+
