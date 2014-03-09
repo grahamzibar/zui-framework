@@ -7,6 +7,7 @@ module.exports = function(grunt) {
             dist: {
                 src: [
                     'scripts/namespace.js',
+                    'scripts/base.js',
                     'scripts/helper/namespace.js',
                     'scripts/helper/key-spline.js',
                     'scripts/helper/helper.js',
@@ -14,7 +15,6 @@ module.exports = function(grunt) {
                     'scripts/def/def.js',
                     'scripts/math/namespace.js',
                     'scripts/math/math.js',
-                    'scripts/base.js',
                     'scripts/hash.js',
                     'scripts/event.js',
                     'scripts/event-listener.js',
