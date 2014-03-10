@@ -65,7 +65,7 @@
                 strokeThickness: 1,
                 strokeThicknessScale: ZUI.Def.WorldScale,
                 fill: true,
-                fillColor: "#FFFFFF",
+                fillColor: "#000000",
                 alpha: 1,
                 centerAt: {
                     horizontal: ZUI.Def.Left,
@@ -132,7 +132,6 @@
 
         // get rendered position
         this.renderedPosition = ZUI.Helper.interpretScale(this.position, this.positionScale);
-
         this.renderedPositionOffset = ZUI.Helper.interpretScale(this.positionOffset, this.positionOffsetScale);
 
         // get rendered stroke thickness

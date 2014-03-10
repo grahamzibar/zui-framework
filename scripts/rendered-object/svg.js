@@ -1,5 +1,5 @@
 (function() {
-
+// TODO retain SVG properties and hierarchy
     // constructor
     ZUI.RenderedObject.SVG = function(properties) {
         // call base constructor
