@@ -42,26 +42,6 @@
         });
         this.border.attachToView(this);
 
-var text = new ZUI.RenderedObject.Text({
-    position: {
-        x: 0,
-        y: 0
-    },
-    positionScale: ZUI.Def.WorldScale,
-    size: 62,
-    sizeScale: ZUI.Def.WorldScale,
-    content: 'Hello World\nNEXTLINE',
-    //isBold: true,
-    //isItalic: true,
-    isUnderline: true,
-    centerAt: {
-        horizontal: ZUI.Def.Center,
-        vertical: ZUI.Def.Center
-    },
-    stroke: false
-});
-text.attachToView(this);
-
         /* Array to keep track of all the lines drawn */
         this.lines = [];
     }
